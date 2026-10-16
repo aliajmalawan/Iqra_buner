@@ -1,0 +1,34 @@
+# ------------------------------------------------------------------
+# IQRA School & College Daggar Buner — files that must NOT go to GitHub
+# (they stay on your computer / server; Git just won't upload them)
+# ------------------------------------------------------------------
+
+# Real database credentials. Commit includes/config.example.php instead
+# and copy it to includes/config.php on each machine / server.
+includes/config.php
+.env
+.env.*
+*.pem
+*.key
+
+# Full database dumps: contain admin password hashes, student/admission
+# records and visitor IP addresses. Schema/migration .sql files are kept.
+bahalwalcollege.sql
+shaheenpublic_db.sql
+*.sql.gz
+*.sql.zip
+*.dump
+
+# Backups and logs
+*.bak
+*.log
+error_log
+
+# Editor / OS / tool files
+.claude/
+tmpclaude-*
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store

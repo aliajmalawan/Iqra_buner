@@ -1,0 +1,43 @@
+-- About page content for IQRA School & College Daggar Buner
+-- (all values remain editable in AdminCP > About; stats in the about_stat* keys)
+-- Facts used: established 1993 (pioneer private institution in District Buner),
+-- Matric + Intermediate (F.Sc Pre-Medical, F.Sc Pre-Engineering, ICS, F.A),
+-- modern building with CCTV and security staff, 25 teaching & supervisory staff.
+-- Mission / vision are DRAFTS — replace them with the school's official wording.
+INSERT INTO settings (setting_key, setting_value) VALUES
+('about_hero_badge',          'About IQRA'),
+('about_hero_subtitle',       'Serving Daggar and District Buner with quality education and character building since 1993.'),
+('about_hero_image',          'images/hero/slide_1792151883_1110.jpg'),
+('about_who_badge',           'Who We Are'),
+('about_who_title',           'A Legacy of Quality Education Since 1993'),
+('about_who_title_highlight', 'Since 1993'),
+('about_description',         'IQRA School & College Daggar Buner has served the community of District Buner since 1993. As one of the pioneering private-sector institutions in the district, it has spent more than three decades focused on quality education and character building.'),
+('about_who_paragraph2',      'Students continue from school level through Matric and Intermediate, with F.Sc Pre-Medical, F.Sc Pre-Engineering, ICS and F.A programs, guided by a dedicated team of teaching and supervisory staff in a modern, secure campus.'),
+('about_who_hl1',             'Established in 1993'),
+('about_who_hl2',             'Matric & Intermediate'),
+('about_who_hl3',             'Modern, Secure Campus'),
+('about_who_hl4',             'Dedicated Teaching Staff'),
+('about_image',               'images/hero/slide_1792151929_4825.jpg'),
+('about_image_badge_num',     '1993'),
+('about_image_badge_label',   'Established'),
+('mission_statement',         'To provide quality education in a safe and disciplined environment, nurturing knowledge, character and confidence so that every student is prepared for higher studies and for life.'),
+('vision_statement',          'To be a trusted centre of learning in District Buner, known for academic excellence, strong moral values and students who serve their community with integrity.'),
+('about_explore_badge',       'Learn More'),
+('about_explore_title',       'Discover More About IQRA'),
+('about_explore_title_highlight', 'About IQRA'),
+('about_explore_subtitle',    'Our values, our leadership and the principles that guide us'),
+('about_stat1_number',        '1993'),
+('about_stat1_label',         'Year Established'),
+('about_stat2_number',        '30+'),
+('about_stat2_label',         'Years of Service'),
+('about_stat3_number',        '25'),
+('about_stat3_label',         'Teaching & Supervisory Staff'),
+('about_stat4_number',        '4'),
+('about_stat4_label',         'Intermediate Programs'),
+('about_cta_badge',           'Join Us'),
+('about_cta_heading_line1',   'Become Part of the'),
+('about_cta_heading_line2',   'IQRA Family'),
+('about_cta_subtext',         'Admissions for Matric and Intermediate (F.Sc, ICS, F.A). Visit the campus or contact us to learn more about {site_name}.'),
+('about_cta_pill1',           'F.Sc · ICS · F.A'),
+('about_cta_pill2',           'Need-Based Scholarships')
+ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value);

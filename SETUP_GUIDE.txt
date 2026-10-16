@@ -1,0 +1,136 @@
+================================================================================
+FORT EDUCATION SYSTEM - QUICK SETUP GUIDE
+================================================================================
+
+Follow these simple steps to get your website running:
+
+STEP 1: INSTALL XAMPP
+----------------------
+- Download XAMPP from: https://www.apachefriends.org/
+- Install XAMPP on your computer
+- Start Apache and MySQL from XAMPP Control Panel
+
+STEP 2: IMPORT DATABASE
+-----------------------
+1. Open browser and go to: http://localhost/phpmyadmin
+2. Click "Import" tab
+3. Click "Choose File" and select: database.sql (from your project folder)
+4. Click "Go" button at the bottom
+5. Database "forteducation_db" will be created automatically
+
+STEP 3: ACCESS YOUR WEBSITE
+---------------------------
+Frontend Website:
+URL: http://localhost/forteducationsystem/
+Browse all pages and features
+
+Admin Panel:
+URL: http://localhost/forteducationsystem/admin/login.php
+Username: admin
+Password: admin123
+
+STEP 4: CUSTOMIZE YOUR WEBSITE
+------------------------------
+1. Add your logo image to: images/logo.png
+2. Update contact information in:
+   - includes/header.php (top bar)
+   - includes/footer.php (footer section)
+   - contact.php (contact page)
+
+3. Change colors in: css/style.css
+   Look for CSS variables:
+   --primary-color: #0B4DA2;
+   --accent-color: #F9C900;
+
+4. Add courses, faculty, events through Admin Panel
+
+STEP 5: IMPORTANT SECURITY
+--------------------------
+After first login:
+1. Change admin password from default
+2. Update database credentials if needed in: includes/config.php
+
+================================================================================
+FEATURES INCLUDED
+================================================================================
+
+FRONTEND PAGES:
+✓ Home - Modern hero section with stats
+✓ About Us - Mission, vision, values
+✓ Courses - Dynamic course listings
+✓ Admission - Online application form
+✓ Faculty - Teacher profiles
+✓ Events - Upcoming events & news
+✓ Gallery - Photo gallery with lightbox
+✓ Contact - Contact form & information
+
+ADMIN PANEL:
+✓ Dashboard with statistics
+✓ Manage Courses (Add/Edit/Delete)
+✓ Manage Faculty (Add/Edit/Delete)
+✓ View & Approve Admissions
+✓ View Contact Messages
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Problem: Can't access website
+Solution: Make sure Apache is running in XAMPP Control Panel
+
+Problem: Database connection error
+Solution: Check if MySQL is running in XAMPP Control Panel
+
+Problem: Can't login to admin
+Solution: Make sure you imported database.sql correctly
+
+Problem: Images not showing
+Solution: Add your images to the images/ folder
+
+================================================================================
+FOLDER PERMISSIONS
+================================================================================
+
+Make sure these folders have write permissions:
+- uploads/documents/
+- uploads/gallery/
+
+================================================================================
+SUPPORT
+================================================================================
+
+Need help? Check:
+- README.md file for detailed documentation
+- Code comments in each PHP file
+- Facebook: https://www.facebook.com/forteducationsystem
+
+================================================================================
+COLOR SCHEME
+================================================================================
+
+Primary Blue: #0B4DA2
+White: #FFFFFF
+Yellow/Gold: #F9C900
+
+These colors represent Fort Education System's candle logo theme.
+
+================================================================================
+DEFAULT DATA
+================================================================================
+
+The website includes default sample data for:
+- Courses (Matric, Intermediate, Entry Tests, etc.)
+- Faculty Members (8 teachers)
+- Events and News items
+
+You can:
+- Keep this data and modify it
+- Delete it and add your own through Admin Panel
+
+================================================================================
+
+That's it! Your modern educational website is ready to use!
+
+Visit: http://localhost/forteducationsystem/
+
+================================================================================

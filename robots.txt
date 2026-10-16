@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /AdminCP/
+Disallow: /includes/
+Disallow: /uploads/
+
+Sitemap: http://localhost/bahawalcollegeofhealth/sitemap.php

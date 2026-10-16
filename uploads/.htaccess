@@ -1,0 +1,7 @@
+# Defense in depth: this directory only ever receives user-uploaded images/
+# documents (never legitimately a script), so PHP execution is disabled here
+# even though upload validation already restricts file types/content —
+# in case a validation bug or misconfiguration ever let something else through.
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phar|pl|py|cgi|asp|aspx|sh)$">
+    Require all denied
+</FilesMatch>
