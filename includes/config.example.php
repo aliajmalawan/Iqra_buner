@@ -32,10 +32,11 @@ if ($isLocalEnv) {
     // "MySQL Databases" section (DB_HOST stays 'localhost' — that's the
     // standard value cPanel expects, not this machine's localhost).
     // ---------------------------------------------------------------
+    // >>> FILL THESE 3 VALUES on the live server (cPanel > MySQL Databases) <<<
     define('DB_HOST', 'localhost');
-    define('DB_USER', 'your_cpanel_db_user');
-    define('DB_PASS', 'your_cpanel_db_password');
-    define('DB_NAME', 'your_cpanel_db_name');
+    define('DB_USER', 'CPANEL_DB_USER');      // e.g. cpaneluser_iqra
+    define('DB_PASS', 'CPANEL_DB_PASSWORD');  // the password you set for that user
+    define('DB_NAME', 'CPANEL_DB_NAME');      // e.g. cpaneluser_iqradaggar
 }
 
 // Create connection
@@ -60,10 +61,14 @@ define('SITE_NAME', 'IQRA School & College Daggar Buner');
 // SITE_URL auto-detects localhost vs. live the same way the DB credentials
 // above do, so canonical URLs / social sharing tags / sitemap links are
 // never accidentally left pointing at a local dev address in production.
-$_siteScheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-$_siteHost = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$_siteBasePath = $isLocalEnv ? '/' . basename(dirname(__DIR__)) . '/' : '/';  // local: this project's folder name
-define('SITE_URL', $_siteScheme . '://' . $_siteHost . $_siteBasePath);
+// Live website address — always https://iqradaggar.com/ on the server.
+define('LIVE_SITE_URL', 'https://iqradaggar.com/');
+if ($isLocalEnv) {
+    $_siteScheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    define('SITE_URL', $_siteScheme . '://' . $_SERVER['HTTP_HOST'] . '/' . basename(dirname(__DIR__)) . '/');  // local: this project's folder name
+} else {
+    define('SITE_URL', LIVE_SITE_URL);
+}
 define('ADMIN_EMAIL', 'principaliqradaggar@gmail.com');
 define('SITE_LOCATION', 'iqra school and college daggar, Bunerwal, Pakistan');
 define('SITE_CONTACT', '0333 9692343');

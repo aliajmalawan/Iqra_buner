@@ -4,4 +4,4 @@ Disallow: /AdminCP/
 Disallow: /includes/
 Disallow: /uploads/
 
-Sitemap: http://localhost/bahawalcollegeofhealth/sitemap.php
+Sitemap: https://iqradaggar.com/sitemap.php
