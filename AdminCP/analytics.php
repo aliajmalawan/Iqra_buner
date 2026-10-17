@@ -71,6 +71,8 @@ function getPageName($url) {
         'director-message.php' => "Director's Message",
         'chairman-message.php' => "Chairman's Message (old link)",
         'principal-message.php' => "Principal's Message",
+        'vice-principal-message.php' => "Vice Principal's Message",
+        'pro-message.php' => "PRO's Message",
         'foundation.php' => 'Welfare Foundation',
         'courses.php' => 'Courses & Programs',
         'faculty.php' => 'Faculty',

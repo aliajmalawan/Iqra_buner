@@ -12,10 +12,22 @@ $director = mysqli_fetch_assoc(mysqli_query($conn, "
                               OR LOWER(designation) LIKE '%chairman%' OR LOWER(role_title) LIKE '%chairman%')
     ORDER BY (LOWER(designation) LIKE '%director%' OR LOWER(role_title) LIKE '%director%') DESC, display_order ASC LIMIT 1
 "));
-$has_principal = (bool) mysqli_fetch_assoc(mysqli_query($conn, "
-    SELECT id FROM leadership
-    WHERE status = 'active' AND (LOWER(designation) LIKE '%principal%' OR LOWER(role_title) LIKE '%principal%') LIMIT 1
-"));
+$msg_pages = [
+    ['director-message.php',  'fa-user-tie',      "Director's Message",  'A message from our Director to the school community.',            "LOWER(designation) LIKE '%director%' OR LOWER(role_title) LIKE '%director%' OR LOWER(designation) LIKE '%chairman%' OR LOWER(role_title) LIKE '%chairman%'"],
+    ['principal-message.php', 'fa-user-graduate', "Principal's Message", 'A message from our Principal on learning and student life.',      "(LOWER(designation) LIKE '%principal%' OR LOWER(role_title) LIKE '%principal%') AND LOWER(designation) NOT LIKE '%vice%' AND LOWER(role_title) NOT LIKE '%vice%'"],
+    ['vice-principal-message.php', 'fa-chalkboard-user', "Vice Principal's Message", 'A message from our Vice Principal on teaching and academics.', "LOWER(designation) LIKE '%vice principal%' OR LOWER(role_title) LIKE '%vice principal%'"],
+    ['pro-message.php',       'fa-handshake',     "PRO's Message",       'A message from our Public Relations Officer to parents and the community.', "LOWER(designation) LIKE '%public relation%' OR LOWER(role_title) LIKE '%public relation%'"],
+];
+$more = [];
+foreach ($msg_pages as $mp) {
+    if ($mp[0] === basename($_SERVER['SCRIPT_NAME'])) continue;
+    if (mysqli_fetch_assoc(mysqli_query($conn, "SELECT id FROM leadership WHERE status = 'active' AND ({$mp[4]}) LIMIT 1"))) $more[] = $mp;
+}
+foreach ([['leadership.php', 'fa-users', 'Our Leadership', 'Messages from the people who guide our institution.'],
+          ['core-values.php', 'fa-heart', 'Core Values', 'The principles our teachers and students live by.'],
+          ['contact.php', 'fa-envelope', 'Contact Us', 'Reach the school administration for any query.']] as $fb) {
+    if (count($more) < 3) $more[] = $fb;
+}
 $about = getAboutContent();
 $chm_hero_image = getSetting('chm_hero_image', 'images/hero/slide_1792151883_1110.jpg');
 
@@ -224,7 +236,7 @@ function chmInitials($name) {
                         <?php endif; ?>
                         <div>
                             <strong><?php echo htmlspecialchars($director['name']); ?></strong>
-                            <span><?php echo htmlspecialchars($director['designation'] ?: 'Director'); ?>, <?php echo htmlspecialchars(getSiteName()); ?></span>
+                            <span><?php $__des = $director['designation'] ?: 'Director'; echo htmlspecialchars(stripos($__des, 'IQRA') !== false ? $__des : $__des . ', ' . getSiteName()); ?></span>
                         </div>
                     </div>
                 </div>
@@ -278,13 +290,7 @@ function chmInitials($name) {
             <h2>More From <span>Our Leadership</span></h2>
         </div>
         <div class="chm-more-grid">
-            <?php
-            $more = [];
-            if ($has_principal) $more[] = ['principal-message.php', 'fa-user-graduate', "Principal's Message", 'A message from our Principal on learning and student life.'];
-            $more[] = ['leadership.php',     'fa-users',        'Our Leadership',  'Messages from the people who guide our institution.'];
-            $more[] = ['core-values.php',    'fa-heart',        'Core Values',     'The principles our teachers and students live by.'];
-            if (!$has_principal) $more[] = ['contact.php', 'fa-envelope', 'Contact Us', 'Reach the school administration for any query.'];
-            foreach ($more as $c): ?>
+            <?php foreach ($more as $c): ?>
             <a href="<?php echo $c[0]; ?>" class="ui-card chm-reveal">
                 <span class="ui-icon"><i class="fas <?php echo $c[1]; ?>" aria-hidden="true"></i></span>
                 <h3><?php echo $c[2]; ?></h3>

@@ -13,10 +13,22 @@ $principal = mysqli_fetch_assoc(mysqli_query($conn, "
       AND LOWER(designation) NOT LIKE '%vice%' AND LOWER(role_title) NOT LIKE '%vice%'
     ORDER BY display_order ASC LIMIT 1
 "));
-$has_director = (bool) mysqli_fetch_assoc(mysqli_query($conn, "
-    SELECT id FROM leadership
-    WHERE status = 'active' AND (LOWER(designation) LIKE '%director%' OR LOWER(role_title) LIKE '%director%' OR LOWER(designation) LIKE '%chairman%' OR LOWER(role_title) LIKE '%chairman%') LIMIT 1
-"));
+$msg_pages = [
+    ['director-message.php',  'fa-user-tie',      "Director's Message",  'A message from our Director to the school community.',            "LOWER(designation) LIKE '%director%' OR LOWER(role_title) LIKE '%director%' OR LOWER(designation) LIKE '%chairman%' OR LOWER(role_title) LIKE '%chairman%'"],
+    ['principal-message.php', 'fa-user-graduate', "Principal's Message", 'A message from our Principal on learning and student life.',      "(LOWER(designation) LIKE '%principal%' OR LOWER(role_title) LIKE '%principal%') AND LOWER(designation) NOT LIKE '%vice%' AND LOWER(role_title) NOT LIKE '%vice%'"],
+    ['vice-principal-message.php', 'fa-chalkboard-user', "Vice Principal's Message", 'A message from our Vice Principal on teaching and academics.', "LOWER(designation) LIKE '%vice principal%' OR LOWER(role_title) LIKE '%vice principal%'"],
+    ['pro-message.php',       'fa-handshake',     "PRO's Message",       'A message from our Public Relations Officer to parents and the community.', "LOWER(designation) LIKE '%public relation%' OR LOWER(role_title) LIKE '%public relation%'"],
+];
+$more = [];
+foreach ($msg_pages as $mp) {
+    if ($mp[0] === basename($_SERVER['SCRIPT_NAME'])) continue;
+    if (mysqli_fetch_assoc(mysqli_query($conn, "SELECT id FROM leadership WHERE status = 'active' AND ({$mp[4]}) LIMIT 1"))) $more[] = $mp;
+}
+foreach ([['leadership.php', 'fa-users', 'Our Leadership', 'Messages from the people who guide our institution.'],
+          ['core-values.php', 'fa-heart', 'Core Values', 'The principles our teachers and students live by.'],
+          ['contact.php', 'fa-envelope', 'Contact Us', 'Reach the school administration for any query.']] as $fb) {
+    if (count($more) < 3) $more[] = $fb;
+}
 $about = getAboutContent();
 $chm_hero_image = getSetting('prm_hero_image', 'images/hero/slide_1792151929_4825.jpg');
 
@@ -97,6 +109,7 @@ function prmInitials($name) {
 .chm-side-role { color:var(--accent-bright); font-family:var(--font-heading); font-size:var(--fs-overline); font-weight:600; letter-spacing:1.8px; text-transform:uppercase; margin-bottom:8px; }
 .chm-side h2 { font-size:22px; font-weight:600; line-height:1.3; margin:0 0 4px; color:#fff; }
 .chm-side p { font-size:var(--fs-body-sm); color:rgba(255,255,255,0.7); margin:0; }
+.chm-side-note { margin-top:16px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.14); font-size:var(--fs-caption); line-height:1.6; color:rgba(255,255,255,0.7); max-width:260px; margin-left:auto; margin-right:auto; }
 
 .chm-body { padding:52px 56px; }
 .chm-label { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
@@ -211,6 +224,9 @@ function prmInitials($name) {
                     <?php if (!empty($principal['role_title'])): ?><div class="chm-side-role"><?php echo htmlspecialchars($principal['role_title']); ?></div><?php endif; ?>
                     <h2><?php echo htmlspecialchars($principal['name']); ?></h2>
                     <?php if (!empty($principal['designation'])): ?><p><?php echo htmlspecialchars($principal['designation']); ?></p><?php endif; ?>
+                    <?php $prm_note = trim(getSetting('principal_profile_note', '')); if ($prm_note !== ''): ?>
+                    <div class="chm-side-note"><?php echo nl2br(htmlspecialchars($prm_note)); ?></div>
+                    <?php endif; ?>
                 </div>
                 <div class="chm-body">
                     <div class="chm-label"><span>Message</span></div>
@@ -225,7 +241,7 @@ function prmInitials($name) {
                         <?php endif; ?>
                         <div>
                             <strong><?php echo htmlspecialchars($principal['name']); ?></strong>
-                            <span><?php echo htmlspecialchars($principal['designation'] ?: 'Principal'); ?>, <?php echo htmlspecialchars(getSiteName()); ?></span>
+                            <span><?php echo htmlspecialchars(($principal['role_title'] ?: ($principal['designation'] ?: 'Principal')) . ', ' . getSiteName()); ?></span>
                         </div>
                     </div>
                 </div>
@@ -279,13 +295,7 @@ function prmInitials($name) {
             <h2>More From <span>Our Leadership</span></h2>
         </div>
         <div class="chm-more-grid">
-            <?php
-            $more = [];
-            if ($has_director) $more[] = ['director-message.php', 'fa-user-tie', "Director's Message", 'A message from our Director to the school community.'];
-            $more[] = ['leadership.php',     'fa-users',        'Our Leadership',  'Messages from the people who guide our institution.'];
-            $more[] = ['core-values.php',    'fa-heart',        'Core Values',     'The principles our teachers and students live by.'];
-            if (!$has_director) $more[] = ['contact.php', 'fa-envelope', 'Contact Us', 'Reach the school administration for any query.'];
-            foreach ($more as $c): ?>
+            <?php foreach ($more as $c): ?>
             <a href="<?php echo $c[0]; ?>" class="ui-card chm-reveal">
                 <span class="ui-icon"><i class="fas <?php echo $c[1]; ?>" aria-hidden="true"></i></span>
                 <h3><?php echo $c[2]; ?></h3>

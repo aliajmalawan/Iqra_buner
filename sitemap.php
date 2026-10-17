@@ -15,6 +15,8 @@ $pages = [
     ['url' => 'leadership.php', 'priority' => '0.6', 'changefreq' => 'monthly'],
     ['url' => 'director-message.php', 'priority' => '0.5', 'changefreq' => 'yearly'],
     ['url' => 'principal-message.php', 'priority' => '0.5', 'changefreq' => 'yearly'],
+    ['url' => 'vice-principal-message.php', 'priority' => '0.5', 'changefreq' => 'yearly'],
+    ['url' => 'pro-message.php', 'priority' => '0.5', 'changefreq' => 'yearly'],
     ['url' => 'courses.php', 'priority' => '0.9', 'changefreq' => 'monthly'],
     ['url' => 'faculty.php', 'priority' => '0.8', 'changefreq' => 'monthly'],
     ['url' => 'examination.php', 'priority' => '0.6', 'changefreq' => 'monthly'],
