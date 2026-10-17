@@ -68,7 +68,7 @@ function getPageName($url) {
         'mission-vision.php' => 'Mission & Vision',
         'core-values.php' => 'Core Values',
         'leadership.php' => 'Leadership',
-        'director-message.php' => "Director's Message",
+        'director-message.php' => "Director's Message (removed)",
         'chairman-message.php' => "Chairman's Message (old link)",
         'principal-message.php' => "Principal's Message",
         'vice-principal-message.php' => "Vice Principal's Message",

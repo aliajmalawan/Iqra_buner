@@ -1,0 +1,14 @@
+---
+# cPanel > Git Version Control > "Deploy HEAD Commit" runs these tasks.
+# They copy the website files from the cloned repository into the live
+# website folder. includes/config.php is never in Git, so the live one
+# (with the database password) is left untouched, and nothing is deleted
+# on the server (uploaded images in uploads/ stay safe).
+#
+# DEPLOYPATH = the document root of iqradaggar.com. If your domain uses a
+# different folder (cPanel > Domains), change public_html below.
+deployment:
+  tasks:
+    - export DEPLOYPATH=$HOME/public_html/
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/rsync -a --exclude='.git' --exclude='.cpanel.yml' --exclude='includes/config.php' ./ $DEPLOYPATH

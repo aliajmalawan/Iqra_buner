@@ -11,7 +11,6 @@ $vp = mysqli_fetch_assoc(mysqli_query($conn, "
     ORDER BY display_order ASC LIMIT 1
 "));
 $msg_pages = [
-    ['director-message.php',  'fa-user-tie',      "Director's Message",  'A message from our Director to the school community.',            "LOWER(designation) LIKE '%director%' OR LOWER(role_title) LIKE '%director%' OR LOWER(designation) LIKE '%chairman%' OR LOWER(role_title) LIKE '%chairman%'"],
     ['principal-message.php', 'fa-user-graduate', "Principal's Message", 'A message from our Principal on learning and student life.',      "(LOWER(designation) LIKE '%principal%' OR LOWER(role_title) LIKE '%principal%') AND LOWER(designation) NOT LIKE '%vice%' AND LOWER(role_title) NOT LIKE '%vice%'"],
     ['vice-principal-message.php', 'fa-chalkboard-user', "Vice Principal's Message", 'A message from our Vice Principal on teaching and academics.', "LOWER(designation) LIKE '%vice principal%' OR LOWER(role_title) LIKE '%vice principal%'"],
     ['pro-message.php',       'fa-handshake',     "PRO's Message",       'A message from our Public Relations Officer to parents and the community.', "LOWER(designation) LIKE '%public relation%' OR LOWER(role_title) LIKE '%public relation%'"],

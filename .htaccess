@@ -54,7 +54,7 @@ Options -Indexes
     RewriteCond $0#%{REQUEST_URI} ^([^#]*)#(.*)\1$
     RewriteRule ^(fee-calculator|scholarships|eligibility-checker)\.php$ %2admission.php [R=301,L,NC]
 
-    # Chairman's Message renamed → Director's Message
+    # Chairman's / Director's Message pages removed → Leadership page
     RewriteCond $0#%{REQUEST_URI} ^([^#]*)#(.*)\1$
-    RewriteRule ^chairman-message\.php$ %2director-message.php [R=301,L,NC]
+    RewriteRule ^(chairman-message|director-message)\.php$ %2leadership.php [R=301,L,NC]
 </IfModule>
