@@ -22,7 +22,7 @@ $total_programs = array_sum(array_map('count', $by_level));
 $courses_hero = getCoursesHero();
 $courses_req  = getCoursesRequirements();
 $courses_cta_content = getCoursesCta();
-$cr_hero_image = getSetting('cr_hero_image', 'images/hero/slide_1792151929_4825.jpg');
+$cr_hero_image = getSetting('cr_hero_image', 'images/banners/banner-courtyard.jpg');
 
 // Campuses (editable settings)
 $campuses = [

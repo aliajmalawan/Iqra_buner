@@ -5,7 +5,7 @@ $page_description = 'Meet the leadership of ' . getSiteName() . ' and read their
 
 $leaders = getLeadershipMessages();          // AdminCP > About / Home Page > Leadership
 $leader_count = count($leaders);
-$ld_hero_image = getSetting('ld_hero_image', 'images/hero/slide_1792151883_1110.jpg');
+$ld_hero_image = getSetting('ld_hero_image', 'images/banners/banner-building.jpg');
 $phone_numbers = array_filter(array_map('trim', explode(',', getSitePhone())));
 $first_phone = reset($phone_numbers) ?: '';
 

@@ -15,7 +15,7 @@ $value_count = count($core_values);
 $number_words = [1 => 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve'];
 
 // Hero photo (campus); editable via the cv_hero_image setting
-$cv_hero_image = getSetting('cv_hero_image', 'images/hero/slide_1792151883_1110.jpg');
+$cv_hero_image = getSetting('cv_hero_image', 'images/banners/banner-building.jpg');
 ?>
 <?php include 'includes/header.php'; ?>
 

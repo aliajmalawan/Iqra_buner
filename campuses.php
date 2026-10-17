@@ -36,7 +36,7 @@ foreach (['camp_stat_students' => 'Students', 'camp_stat_passrate' => 'Pass Rate
 }
 if (count($camp_stats) < 4) $camp_stats[] = ['number' => 'PG – Inter', 'label' => 'At Every Campus'];
 
-$camp_hero_image = getSetting('camp_hero_image', 'images/hero/slide_1792151929_4825.jpg');
+$camp_hero_image = getSetting('camp_hero_image', 'images/banners/banner-courtyard.jpg');
 $camp_tel = function ($p) { return preg_replace('/[^\d+]/', '', (string) $p); };
 ?>
 <?php include 'includes/header.php'; ?>

@@ -20,6 +20,26 @@ if (empty($carousel_slides)) {
 }
 $slide_count = count($carousel_slides);
 $HERO_INTERVAL = 6500; // ms per slide
+
+// Crisp inline SVG icons for the slider (same stroke weight everywhere)
+function heroIcon($name) {
+    $paths = [
+        'arrow-right' => '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
+        'arrow-left'  => '<path d="M19 12H5"/><path d="m11 18-6-6 6-6"/>',
+        'chevron'     => '<path d="m9 6 6 6-6 6"/>',
+        'pause'       => '<path d="M9 5v14"/><path d="M15 5v14"/>',
+        'play'        => '<path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z"/>',
+        'award'       => '<circle cx="12" cy="9" r="6"/><path d="m8.5 13.9-1.5 8.1 5-3 5 3-1.5-8.1"/>',
+        'building'    => '<path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v8h4"/><path d="M18 9h2a2 2 0 0 1 2 2v11h-4"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M2 22h20"/>',
+        'cap'         => '<path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c3.5 2.7 8.5 2.7 12 0v-5"/><path d="M22 10v6"/>',
+    ];
+    return '<svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . ($paths[$name] ?? '') . '</svg>';
+}
+$hero_highlights = [
+    ['award',    'Since ' . getSetting('camp_since_year', '1993')],
+    ['building', 'Boys & Girls Campuses'],
+    ['cap',      'Play Group to Intermediate'],
+];
 ?>
 
 <style>
@@ -87,11 +107,21 @@ $HERO_INTERVAL = 6500; // ms per slide
     max-width:580px; margin-bottom:34px;
     text-shadow:0 1px 12px rgba(11,31,66,0.35);
 }
+.hero-carousel .hi { width:18px; height:18px; flex-shrink:0; display:block; }
 .cs-btns { display:flex; flex-wrap:wrap; gap:14px; }
-.cs-btns .btn { padding:0 28px; }
-.cs-btns .btn i { font-size:12px; transition:transform 0.25s ease; }
-.cs-btns .btn:hover i { transform:translateX(3px); }
+.cs-btns .btn { padding:0 26px; gap:10px; }
+.cs-btns .btn .hi { transition:transform 0.25s var(--ease-out); }
+.cs-btns .btn:hover .hi { transform:translateX(4px); }
 .cs-btns .btn-accent { box-shadow:0 10px 26px rgba(11,166,201,0.32); }
+.cs-btns .cs-btn-ghost { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.5); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+.cs-btns .cs-btn-ghost:hover { background:#fff; border-color:#fff; color:var(--primary-color); }
+.cs-btns .cs-btn-ghost .hi { width:16px; height:16px; }
+
+/* Highlights under the buttons */
+.cs-highlights { display:flex; flex-wrap:wrap; gap:10px 26px; list-style:none; margin:30px 0 0; padding:22px 0 0; border-top:1px solid rgba(255,255,255,0.16); max-width:620px; }
+.cs-highlights li { display:inline-flex; align-items:center; gap:10px; color:rgba(255,255,255,0.88); font-size:var(--fs-body-sm); font-weight:500; }
+.cs-hl-ico { width:34px; height:34px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; background:rgba(217,166,46,0.14); border:1px solid rgba(217,166,46,0.35); color:var(--gold-color); }
+.cs-hl-ico .hi { width:17px; height:17px; }
 
 /* Staggered entrance each time a slide becomes active */
 .carousel-slide.active .cs-anim { animation:cs-fade-up 0.8s var(--ease-out) both; }
@@ -111,7 +141,7 @@ $HERO_INTERVAL = 6500; // ms per slide
 .cs-counter b { color:#fff; font-size:17px; font-weight:700; }
 .carousel-dots { display:flex; align-items:center; gap:8px; }
 .carousel-dot {
-    position:relative; width:46px; height:22px; padding:0;
+    position:relative; width:46px; height:36px; padding:0;
     background:none; border:0; cursor:pointer;
 }
 .carousel-dot::before,
@@ -126,17 +156,31 @@ $HERO_INTERVAL = 6500; // ms per slide
 .hero-carousel.is-hold .carousel-dot.active span { animation-play-state:paused; }
 @keyframes cs-progress { from { width:0; } to { width:100%; } }
 
-.carousel-arrows { display:flex; align-items:center; gap:10px; }
+/* One glass control bar: pause | previous · next */
+.carousel-arrows {
+    display:flex; align-items:center; gap:4px; padding:5px;
+    border-radius:999px;
+    background:rgba(11,31,66,0.42);
+    border:1px solid rgba(255,255,255,0.16);
+    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    box-shadow:0 10px 30px rgba(6,18,40,0.28);
+}
 .cs-btn-round {
     width:44px; height:44px; border-radius:50%; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
-    color:#fff; font-size:14px; cursor:pointer;
-    background:rgba(11,31,66,0.35);
-    border:1px solid rgba(255,255,255,0.32);
-    transition:background-color 0.2s ease, border-color 0.2s ease;
+    color:#fff; cursor:pointer; padding:0;
+    background:transparent; border:0;
+    transition:background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
-.cs-btn-round:hover { background:var(--accent-color); border-color:var(--accent-color); }
-.cs-pause { margin-right:6px; }
+.cs-btn-round:hover { background:rgba(255,255,255,0.14); }
+.cs-btn-round:active { transform:scale(0.94); }
+.carousel-next { background:#fff; color:var(--primary-color); }
+.carousel-next:hover { background:var(--accent-color); color:#fff; }
+.cs-ctrl-sep { width:1px; height:22px; background:rgba(255,255,255,0.22); margin:0 4px; }
+.cs-pause .hi { width:17px; height:17px; }
+.cs-pause .ico-play .hi { fill:currentColor; stroke:none; width:15px; height:15px; margin-left:2px; }
+.cs-pause .ico-play, .hero-carousel:not(.is-playing) .cs-pause .ico-pause { display:none; }
+.hero-carousel:not(.is-playing) .cs-pause .ico-play { display:flex; }
 .hero-carousel button:focus-visible,
 .hero-carousel a:focus-visible { outline:2px solid #fff; outline-offset:3px; }
 
@@ -158,11 +202,15 @@ $HERO_INTERVAL = 6500; // ms per slide
     .cs-controls { bottom:20px; }
     .cs-counter { display:none; }
     .carousel-dot { width:34px; }
-    .cs-btn-round { width:40px; height:40px; font-size:13px; }
+    .cs-btn-round { width:40px; height:40px; }
+    .cs-highlights { gap:10px 18px; margin-top:24px; padding-top:18px; }
+    .cs-highlights li { font-size:13px; }
+    .cs-hl-ico { width:30px; height:30px; border-radius:9px; }
 }
 @media (max-width:480px) {
     .cs-btns { flex-direction:column; align-items:stretch; }
     .cs-btns .btn { justify-content:center; }
+    .cs-highlights li:nth-child(3) { display:none; }
 }
 
 @media (prefers-reduced-motion:reduce) {
@@ -200,9 +248,15 @@ $HERO_INTERVAL = 6500; // ms per slide
                     <?php endif; ?>
 
                     <div class="cs-btns cs-anim">
-                        <a href="admission.php" class="btn btn-accent btn-lg">Apply Now <i class="fas fa-arrow-right"></i></a>
-                        <a href="courses.php" class="btn btn-outline btn-lg">Explore Programs <i class="fas fa-book-open"></i></a>
+                        <a href="admission.php" class="btn btn-accent btn-lg">Apply Now <?php echo heroIcon('arrow-right'); ?></a>
+                        <a href="courses.php" class="btn btn-outline btn-lg cs-btn-ghost">Explore Programs <?php echo heroIcon('chevron'); ?></a>
                     </div>
+
+                    <ul class="cs-highlights cs-anim" aria-label="Highlights">
+                        <?php foreach ($hero_highlights as $hl): ?>
+                        <li><span class="cs-hl-ico"><?php echo heroIcon($hl[0]); ?></span><?php echo htmlspecialchars($hl[1]); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -223,9 +277,10 @@ $HERO_INTERVAL = 6500; // ms per slide
                 </div>
             </div>
             <div class="carousel-arrows">
-                <button type="button" class="cs-btn-round cs-pause" id="heroPause" aria-label="Pause slideshow"><i class="fas fa-pause" aria-hidden="true"></i></button>
-                <button type="button" class="cs-btn-round carousel-prev" aria-label="Previous slide"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
-                <button type="button" class="cs-btn-round carousel-next" aria-label="Next slide"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+                <button type="button" class="cs-btn-round cs-pause" id="heroPause" aria-label="Pause slideshow"><span class="ico-pause"><?php echo heroIcon('pause'); ?></span><span class="ico-play"><?php echo heroIcon('play'); ?></span></button>
+                <span class="cs-ctrl-sep" aria-hidden="true"></span>
+                <button type="button" class="cs-btn-round carousel-prev" aria-label="Previous slide"><?php echo heroIcon('arrow-left'); ?></button>
+                <button type="button" class="cs-btn-round carousel-next" aria-label="Next slide"><?php echo heroIcon('arrow-right'); ?></button>
             </div>
         </div>
     </div>
@@ -259,7 +314,6 @@ document.addEventListener('DOMContentLoaded', function () {
         section.classList.toggle('is-playing', playing);
         section.classList.toggle('is-hold', held);
         pauseBtn.setAttribute('aria-label', playing ? 'Pause slideshow' : 'Play slideshow');
-        pauseBtn.innerHTML = '<i class="fas ' + (playing ? 'fa-pause' : 'fa-play') + '" aria-hidden="true"></i>';
     }
 
     function show(idx) {

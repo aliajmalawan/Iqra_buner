@@ -6,7 +6,7 @@ $about = getAboutContent();
 $about_stats = getAboutStats();
 
 // Hero photo (campus); editable via the mv_hero_image setting
-$mv_hero_image = getSetting('mv_hero_image', 'images/hero/slide_1792151929_4825.jpg');
+$mv_hero_image = getSetting('mv_hero_image', 'images/banners/banner-courtyard.jpg');
 
 // "Our mission in practice" — four commitments (editable via mv_pillarN_* settings)
 $mv_pillars = [

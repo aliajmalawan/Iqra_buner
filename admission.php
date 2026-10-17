@@ -192,7 +192,7 @@ $selected_course = $f['course_id'] !== '' ? $f['course_id'] : ($_GET['course'] ?
 $selected_campus = $f['campus'] !== '' ? $f['campus'] : ($_GET['campus'] ?? '');
 $adm_steps = getAdmissionSteps();
 $adm_docs  = getAdmissionDocuments();
-$adm_hero_image = getSetting('adm_hero_image', 'images/hero/slide_1792151883_1110.jpg');
+$adm_hero_image = getSetting('adm_hero_image', 'images/banners/banner-building.jpg');
 ?>
 <?php include 'includes/header.php'; ?>
 

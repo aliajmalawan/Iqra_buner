@@ -26,7 +26,7 @@ foreach ([['leadership.php', 'fa-users', 'Our Leadership', 'Messages from the pe
     if (count($more) < 3) $more[] = $fb;
 }
 $about = getAboutContent();
-$chm_hero_image = getSetting('pro_hero_image', 'images/hero/slide_1792151883_1110.jpg');
+$chm_hero_image = getSetting('pro_hero_image', 'images/banners/banner-building.jpg');
 
 $paras = [];
 $pull_quote = '';
