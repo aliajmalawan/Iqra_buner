@@ -1,14 +1,16 @@
 <?php
 require_once 'includes/config.php';
-$page_title = "Chairman's Message";
-$page_description = "A message from the Chairman of " . getSiteName() . " to our students, parents and community.";
+$page_title = "Director's Message";
+$page_description = "A message from the Director of " . getSiteName() . " to our students, parents and community.";
 
-// Reuses the Leadership CMS (AdminCP > Home Page > Leadership): the Chairman is the
-// first active entry whose designation or role title contains "chairman".
-$chairman = mysqli_fetch_assoc(mysqli_query($conn, "
+// Reuses the Leadership CMS (AdminCP > Home Page > Leadership): the Director is the
+// first active entry whose designation or role title contains "director"
+// (older "chairman" entries still match as a fallback).
+$director = mysqli_fetch_assoc(mysqli_query($conn, "
     SELECT * FROM leadership
-    WHERE status = 'active' AND (LOWER(designation) LIKE '%chairman%' OR LOWER(role_title) LIKE '%chairman%')
-    ORDER BY display_order ASC LIMIT 1
+    WHERE status = 'active' AND (LOWER(designation) LIKE '%director%' OR LOWER(role_title) LIKE '%director%'
+                              OR LOWER(designation) LIKE '%chairman%' OR LOWER(role_title) LIKE '%chairman%')
+    ORDER BY (LOWER(designation) LIKE '%director%' OR LOWER(role_title) LIKE '%director%') DESC, display_order ASC LIMIT 1
 "));
 $has_principal = (bool) mysqli_fetch_assoc(mysqli_query($conn, "
     SELECT id FROM leadership
@@ -19,10 +21,10 @@ $chm_hero_image = getSetting('chm_hero_image', 'images/hero/slide_1792151883_111
 
 $paras = [];
 $pull_quote = '';
-if ($chairman && trim($chairman['message']) !== '') {
-    $paras = array_values(array_filter(array_map('trim', preg_split('/\R+/', $chairman['message']))));
+if ($director && trim($director['message']) !== '') {
+    $paras = array_values(array_filter(array_map('trim', preg_split('/\R+/', $director['message']))));
     // first sentence becomes the large pull quote (only when the message is long enough to repeat it)
-    if (preg_match('/^(.{30,220}?[.!?])(\s|$)/u', $paras[0], $m) && mb_strlen($chairman['message']) > 260) {
+    if (preg_match('/^(.{30,220}?[.!?])(\s|$)/u', $paras[0], $m) && mb_strlen($director['message']) > 260) {
         $pull_quote = $m[1];
     }
 }
@@ -36,7 +38,7 @@ function chmInitials($name) {
 
 <style>
 /* ================================================================
-   Chairman's Message — uses the shared system in css/style.css
+   Director's Message — uses the shared system in css/style.css
    ================================================================ */
 
 /* ── Hero ── */
@@ -175,18 +177,18 @@ function chmInitials($name) {
             <i class="fas fa-chevron-right" aria-hidden="true"></i>
             <a href="leadership.php">Leadership</a>
             <i class="fas fa-chevron-right" aria-hidden="true"></i>
-            <span aria-current="page">Chairman's Message</span>
+            <span aria-current="page">Director's Message</span>
         </nav>
-        <div class="chm-hero-badge">From the Chairman's Desk</div>
-        <h1>Chairman's <span>Message</span></h1>
-        <p>A personal message from the Chairman of <?php echo htmlspecialchars(getSiteName()); ?> to our students, parents and community.</p>
+        <div class="chm-hero-badge">From the Director's Desk</div>
+        <h1>Director's <span>Message</span></h1>
+        <p>A personal message from the Director of <?php echo htmlspecialchars(getSiteName()); ?> to our students, parents and community.</p>
     </div>
 </section>
 
 <!-- ── Message ── -->
 <section class="chm-section">
     <div class="container">
-        <?php if ($chairman && $paras): ?>
+        <?php if ($director && $paras): ?>
 
             <?php if ($pull_quote): ?>
             <blockquote class="chm-pull chm-reveal">
@@ -198,31 +200,31 @@ function chmInitials($name) {
             <article class="chm-card chm-reveal">
                 <div class="chm-side">
                     <div class="chm-portrait">
-                        <?php if (!empty($chairman['photo'])): ?>
-                            <img src="<?php echo htmlspecialchars($chairman['photo']); ?>" alt="<?php echo htmlspecialchars($chairman['name']); ?>"
-                                 onerror="this.outerHTML='<div class=&quot;chm-initials&quot;><?php echo htmlspecialchars(chmInitials($chairman['name']), ENT_QUOTES); ?></div>'">
+                        <?php if (!empty($director['photo'])): ?>
+                            <img src="<?php echo htmlspecialchars($director['photo']); ?>" alt="<?php echo htmlspecialchars($director['name']); ?>"
+                                 onerror="this.outerHTML='<div class=&quot;chm-initials&quot;><?php echo htmlspecialchars(chmInitials($director['name']), ENT_QUOTES); ?></div>'">
                         <?php else: ?>
-                            <div class="chm-initials" aria-hidden="true"><?php echo htmlspecialchars(chmInitials($chairman['name'])); ?></div>
+                            <div class="chm-initials" aria-hidden="true"><?php echo htmlspecialchars(chmInitials($director['name'])); ?></div>
                         <?php endif; ?>
                     </div>
-                    <?php if (!empty($chairman['role_title'])): ?><div class="chm-side-role"><?php echo htmlspecialchars($chairman['role_title']); ?></div><?php endif; ?>
-                    <h2><?php echo htmlspecialchars($chairman['name']); ?></h2>
-                    <?php if (!empty($chairman['designation'])): ?><p><?php echo htmlspecialchars($chairman['designation']); ?></p><?php endif; ?>
+                    <?php if (!empty($director['role_title'])): ?><div class="chm-side-role"><?php echo htmlspecialchars($director['role_title']); ?></div><?php endif; ?>
+                    <h2><?php echo htmlspecialchars($director['name']); ?></h2>
+                    <?php if (!empty($director['designation'])): ?><p><?php echo htmlspecialchars($director['designation']); ?></p><?php endif; ?>
                 </div>
                 <div class="chm-body">
                     <div class="chm-label"><span>Message</span></div>
-                    <h3>A Message from Our Chairman</h3>
+                    <h3>A Message from Our Director</h3>
                     <div class="chm-text">
                         <?php foreach ($paras as $p): ?><p><?php echo htmlspecialchars($p); ?></p><?php endforeach; ?>
                     </div>
                     <div class="chm-sign">
-                        <?php if (!empty($chairman['signature'])): ?>
-                            <img src="<?php echo htmlspecialchars($chairman['signature']); ?>" alt="Signature of <?php echo htmlspecialchars($chairman['name']); ?>" loading="lazy" onerror="this.nextElementSibling.remove();this.remove();">
+                        <?php if (!empty($director['signature'])): ?>
+                            <img src="<?php echo htmlspecialchars($director['signature']); ?>" alt="Signature of <?php echo htmlspecialchars($director['name']); ?>" loading="lazy" onerror="this.nextElementSibling.remove();this.remove();">
                             <span class="chm-sign-sep" aria-hidden="true"></span>
                         <?php endif; ?>
                         <div>
-                            <strong><?php echo htmlspecialchars($chairman['name']); ?></strong>
-                            <span><?php echo htmlspecialchars($chairman['designation'] ?: 'Chairman'); ?>, <?php echo htmlspecialchars(getSiteName()); ?></span>
+                            <strong><?php echo htmlspecialchars($director['name']); ?></strong>
+                            <span><?php echo htmlspecialchars($director['designation'] ?: 'Director'); ?>, <?php echo htmlspecialchars(getSiteName()); ?></span>
                         </div>
                     </div>
                 </div>
@@ -231,8 +233,8 @@ function chmInitials($name) {
         <?php else: ?>
             <div class="chm-empty">
                 <span class="ui-icon"><i class="fas fa-user-tie" aria-hidden="true"></i></span>
-                <h3>Chairman's message coming soon</h3>
-                <p>A message from our Chairman will be published here shortly.</p>
+                <h3>Director's message coming soon</h3>
+                <p>A message from our Director will be published here shortly.</p>
                 <a href="leadership.php" class="btn btn-primary"><i class="fas fa-users"></i> View Our Leadership</a>
             </div>
         <?php endif; ?>

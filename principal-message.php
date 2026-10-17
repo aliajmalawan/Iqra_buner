@@ -13,9 +13,9 @@ $principal = mysqli_fetch_assoc(mysqli_query($conn, "
       AND LOWER(designation) NOT LIKE '%vice%' AND LOWER(role_title) NOT LIKE '%vice%'
     ORDER BY display_order ASC LIMIT 1
 "));
-$has_chairman = (bool) mysqli_fetch_assoc(mysqli_query($conn, "
+$has_director = (bool) mysqli_fetch_assoc(mysqli_query($conn, "
     SELECT id FROM leadership
-    WHERE status = 'active' AND (LOWER(designation) LIKE '%chairman%' OR LOWER(role_title) LIKE '%chairman%') LIMIT 1
+    WHERE status = 'active' AND (LOWER(designation) LIKE '%director%' OR LOWER(role_title) LIKE '%director%' OR LOWER(designation) LIKE '%chairman%' OR LOWER(role_title) LIKE '%chairman%') LIMIT 1
 "));
 $about = getAboutContent();
 $chm_hero_image = getSetting('prm_hero_image', 'images/hero/slide_1792151929_4825.jpg');
@@ -281,10 +281,10 @@ function prmInitials($name) {
         <div class="chm-more-grid">
             <?php
             $more = [];
-            if ($has_chairman) $more[] = ['chairman-message.php', 'fa-user-tie', "Chairman's Message", 'A message from our Chairman to the school community.'];
+            if ($has_director) $more[] = ['director-message.php', 'fa-user-tie', "Director's Message", 'A message from our Director to the school community.'];
             $more[] = ['leadership.php',     'fa-users',        'Our Leadership',  'Messages from the people who guide our institution.'];
             $more[] = ['core-values.php',    'fa-heart',        'Core Values',     'The principles our teachers and students live by.'];
-            if (!$has_chairman) $more[] = ['contact.php', 'fa-envelope', 'Contact Us', 'Reach the school administration for any query.'];
+            if (!$has_director) $more[] = ['contact.php', 'fa-envelope', 'Contact Us', 'Reach the school administration for any query.'];
             foreach ($more as $c): ?>
             <a href="<?php echo $c[0]; ?>" class="ui-card chm-reveal">
                 <span class="ui-icon"><i class="fas <?php echo $c[1]; ?>" aria-hidden="true"></i></span>
