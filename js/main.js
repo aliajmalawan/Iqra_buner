@@ -274,3 +274,36 @@ const lightboxStyles = `
 const styleSheet = document.createElement('style');
 styleSheet.textContent = lightboxStyles;
 document.head.appendChild(styleSheet);
+
+// Missing images (file deleted from the server but still referenced in the database):
+// never show a broken-image icon. Gallery cards are removed from the grid, people photos
+// get a neutral avatar, and everything else simply shows its section background.
+(function () {
+    function handle(img) {
+        if (!img || img.dataset.missingHandled) return;
+        img.dataset.missingHandled = '1';
+        var card = img.closest('.gal-card');
+        if (card) { card.classList.add('img-missing'); card.style.display = 'none'; return; }
+        var box = img.parentElement;
+        img.style.visibility = 'hidden';
+        // page banners / slider: their section already has a navy background, so just hide the photo
+        if (img.closest('.cs-media, [class*="hero"]')) return;
+        if (box && box !== document.body) box.classList.add('img-fallback');
+        if (img.closest('.hp-fac-photo, .fac-card-top, .al-avatar, .alp-avatar, .ld-photo, .chm-portrait, .lm-photo')) {
+            box.classList.add('img-fallback-person');
+        }
+    }
+    function isBroken(img) {
+        var src = img.getAttribute('src');
+        return src && img.complete && img.naturalWidth === 0;
+    }
+    // errors that happen after this script runs (lazy images, slides)
+    document.addEventListener('error', function (e) {
+        if (e.target && e.target.tagName === 'IMG' && !e.target.hasAttribute('onerror')) handle(e.target);
+    }, true);
+    // errors that already happened before it ran
+    function scan() {
+        document.querySelectorAll('img:not([onerror])').forEach(function (img) { if (isBroken(img)) handle(img); });
+    }
+    if (document.readyState === 'complete') scan(); else window.addEventListener('load', scan);
+})();

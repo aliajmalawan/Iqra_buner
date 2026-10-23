@@ -1538,3 +1538,9 @@ section { padding: var(--section-y) 0; }
 @media (prefers-reduced-motion: reduce) {
     .hx-nav, .hx-dropdown-panel, .hx-nav > a::after, .hx-dropdown-trigger::after { transition: none; }
 }
+
+/* ── Missing-image fallback (js/main.js adds these classes) ── */
+.img-fallback { background-color: var(--light-blue); }
+.img-fallback-person {
+    background: var(--light-blue) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2390A4BE'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z'/%3E%3C/svg%3E") center / 42% no-repeat;
+}

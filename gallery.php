@@ -588,7 +588,7 @@ filterBtns.forEach(btn => {
         const f = btn.dataset.filter;
         let delay = 0;
         allCards.forEach(card => {
-            const show = f === 'all' || card.dataset.cat === f;
+            const show = !card.classList.contains('img-missing') && (f === 'all' || card.dataset.cat === f);
             if (show) {
                 card.style.display = 'block';
                 card.classList.remove('gal-visible');
