@@ -46,7 +46,7 @@ function auditQuery($conn, $sql, $types, $args) {
     $stmt = mysqli_prepare($conn, $sql);
     if ($types !== '') mysqli_stmt_bind_param($stmt, $types, ...$args);
     mysqli_stmt_execute($stmt);
-    return mysqli_stmt_get_result($stmt);
+    return db_stmt_result($stmt);
 }
 $qs = function ($extra = []) use ($f) {
     $m = array_merge(array_filter(['q' => $f['q'], 'entity' => $f['entity'], 'action_f' => $f['action'], 'user' => $f['user'], 'from' => $f['from'], 'to' => $f['to']], 'strlen'), array_filter($extra, 'strlen'));
@@ -56,7 +56,7 @@ $qs = function ($extra = []) use ($f) {
 /* CSV export */
 if (($_GET['export'] ?? '') === 'csv') {
     $res = auditQuery($conn, "SELECT * FROM admin_audit_log $where_sql ORDER BY id DESC LIMIT 20000", $types, $args);
-    audit_log($conn, 'export', 'audit_log', null, 'Audit log CSV export (' . mysqli_num_rows($res) . ' rows)');
+    audit_log($conn, 'export', 'audit_log', null, 'Audit log CSV export (' . db_num_rows($res) . ' rows)');
     header('Content-Type: text/csv; charset=UTF-8');
     header('Content-Disposition: attachment; filename="iqra-audit-log-' . date('Y-m-d') . '.csv"');
     header('Cache-Control: no-store');
@@ -64,7 +64,7 @@ if (($_GET['export'] ?? '') === 'csv') {
     fwrite($out, "\xEF\xBB\xBF");
     $safe = function ($v) { $v = (string) $v; return preg_match('/^[=+\-@\t\r]/', $v) ? "'" . $v : $v; };
     fputcsv($out, ['Date & Time', 'User', 'Role', 'Action', 'Area', 'Record', 'Details', 'IP Address']);
-    while ($r = mysqli_fetch_assoc($res)) {
+    while ($r = db_fetch_assoc($res)) {
         fputcsv($out, array_map($safe, [$r['created_at'], $r['admin_username'], $r['admin_role'], $r['action'], $ENTITY_LABELS[$r['entity']] ?? $r['entity'], $r['entity_ref'], $r['details'], $r['ip_address']]));
     }
     fclose($out);
@@ -72,16 +72,16 @@ if (($_GET['export'] ?? '') === 'csv') {
 }
 
 $per_page = 50;
-$total = (int) mysqli_fetch_row(auditQuery($conn, "SELECT COUNT(*) FROM admin_audit_log $where_sql", $types, $args))[0];
+$total = (int) db_fetch_row(auditQuery($conn, "SELECT COUNT(*) FROM admin_audit_log $where_sql", $types, $args))[0];
 $pages = max(1, (int) ceil($total / $per_page));
 $page = min(max(1, (int) ($_GET['page'] ?? 1)), $pages);
 $rows = auditQuery($conn, "SELECT * FROM admin_audit_log $where_sql ORDER BY id DESC LIMIT $per_page OFFSET " . (($page - 1) * $per_page), $types, $args);
 
 $actions = []; $users = [];
 $r = mysqli_query($conn, "SELECT DISTINCT action FROM admin_audit_log ORDER BY action");
-while ($r && ($x = mysqli_fetch_row($r))) $actions[] = $x[0];
+while ($r && ($x = db_fetch_row($r))) $actions[] = $x[0];
 $r = mysqli_query($conn, "SELECT DISTINCT admin_username FROM admin_audit_log WHERE admin_username <> '' ORDER BY admin_username LIMIT 200");
-while ($r && ($x = mysqli_fetch_row($r))) $users[] = $x[0];
+while ($r && ($x = db_fetch_row($r))) $users[] = $x[0];
 $h = function ($v) { return htmlspecialchars((string) $v); };
 $tone = function ($a) {
     if (in_array($a, ['delete', 'login_failed', 'account_locked', 'login_blocked', 'denied', 'delete_blocked'], true)) return 'bad';
@@ -157,7 +157,7 @@ $tone = function ($a) {
         <table class="data-table">
             <thead><tr><th>When</th><th>User</th><th>Action</th><th>Area / Record</th><th>Details</th><th>IP</th></tr></thead>
             <tbody>
-            <?php $n = 0; while ($row = mysqli_fetch_assoc($rows)): $n++; $ts = strtotime($row['created_at']); ?>
+            <?php $n = 0; while ($row = db_fetch_assoc($rows)): $n++; $ts = strtotime($row['created_at']); ?>
                 <tr>
                     <td class="au-time"><?php echo $h(date('d M Y', $ts)); ?><small><?php echo $h(date('h:i:s A', $ts)); ?></small></td>
                     <td class="au-user"><strong><?php echo $h($row['admin_username'] ?: '—'); ?></strong><?php if ($row['admin_role']): ?><small><?php echo $h(str_replace('_', ' ', $row['admin_role'])); ?></small><?php endif; ?></td>

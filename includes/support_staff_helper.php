@@ -59,7 +59,7 @@ function staff_ensure_schema($conn) {
 /** Next suggested employee ID: SS-0001, SS-0002 … (admins can type their own). */
 function staff_next_employee_id($conn) {
     $res = mysqli_query($conn, "SELECT employee_id FROM support_staff WHERE employee_id REGEXP '^SS-[0-9]+$' ORDER BY CAST(SUBSTRING(employee_id, 4) AS UNSIGNED) DESC LIMIT 1");
-    $row = $res ? mysqli_fetch_row($res) : null;
+    $row = $res ? db_fetch_row($res) : null;
     $n = $row ? ((int) substr($row[0], 3)) + 1 : 1;
     return 'SS-' . str_pad($n, 4, '0', STR_PAD_LEFT);
 }
@@ -67,7 +67,7 @@ function staff_next_employee_id($conn) {
 function staff_campus_options($conn) {
     $out = [];
     $res = mysqli_query($conn, "SELECT name FROM campuses WHERE status = 'active' ORDER BY display_order, id");
-    while ($res && ($r = mysqli_fetch_row($res))) $out[] = $r[0];
+    while ($res && ($r = db_fetch_row($res))) $out[] = $r[0];
     return $out;
 }
 
@@ -152,7 +152,7 @@ function staff_find_duplicate($conn, $employee_id, $cnic, $exclude_id = 0) {
     $stmt = mysqli_prepare($conn, "SELECT employee_id, cnic FROM support_staff WHERE (employee_id = ? OR cnic = ?) AND id <> ? LIMIT 1");
     mysqli_stmt_bind_param($stmt, 'ssi', $employee_id, $cnic, $exclude_id);
     mysqli_stmt_execute($stmt);
-    $row = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+    $row = db_fetch_assoc(db_stmt_result($stmt));
     mysqli_stmt_close($stmt);
     if (!$row) return null;
     return strcasecmp($row['employee_id'], $employee_id) === 0 ? 'employee_id' : 'cnic';

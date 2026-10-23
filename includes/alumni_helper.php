@@ -27,7 +27,7 @@ function alumni_ensure_schema($conn) {
     $res = mysqli_query($conn, "SHOW COLUMNS FROM alumni");
     if (!$res) return;
     $cols = [];
-    while ($r = mysqli_fetch_assoc($res)) $cols[$r['Field']] = $r;
+    while ($r = db_fetch_assoc($res)) $cols[$r['Field']] = $r;
 
     $alter = [];
     if (!isset($cols['email']))       $alter[] = "ADD COLUMN email VARCHAR(150) NULL AFTER father_name";
@@ -40,7 +40,7 @@ function alumni_ensure_schema($conn) {
 
     $idx = [];
     $ires = mysqli_query($conn, "SHOW INDEX FROM alumni");
-    while ($ires && ($r = mysqli_fetch_assoc($ires))) $idx[$r['Key_name']] = true;
+    while ($ires && ($r = db_fetch_assoc($ires))) $idx[$r['Key_name']] = true;
     if (empty($idx['idx_alumni_email']))  mysqli_query($conn, "ALTER TABLE alumni ADD INDEX idx_alumni_email (email)");
     if (empty($idx['idx_alumni_mobile'])) mysqli_query($conn, "ALTER TABLE alumni ADD INDEX idx_alumni_mobile (mobile_number)");
     if (empty($idx['idx_alumni_status'])) mysqli_query($conn, "ALTER TABLE alumni ADD INDEX idx_alumni_status (status, passing_year)");
@@ -50,7 +50,7 @@ function alumni_ensure_schema($conn) {
 function alumni_program_options($conn) {
     $opts = [];
     $res = mysqli_query($conn, "SELECT name FROM courses WHERE status='active' AND category IN ('matric','inter') ORDER BY display_order ASC, id ASC");
-    while ($res && ($r = mysqli_fetch_assoc($res))) $opts[] = $r['name'];
+    while ($res && ($r = db_fetch_assoc($res))) $opts[] = $r['name'];
     foreach (['Matric (Arts / General)', 'Middle (Class 8)'] as $extra) {
         if (!in_array($extra, $opts, true)) $opts[] = $extra;
     }
@@ -134,7 +134,7 @@ function alumni_find_duplicate($conn, $email, $mobile, $exclude_id = 0) {
     $stmt = mysqli_prepare($conn, "SELECT id, status FROM alumni WHERE (email = ? OR mobile_number = ?) AND status <> 'rejected' AND id <> ? LIMIT 1");
     mysqli_stmt_bind_param($stmt, 'ssi', $email, $mobile, $exclude_id);
     mysqli_stmt_execute($stmt);
-    $row = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+    $row = db_fetch_assoc(db_stmt_result($stmt));
     mysqli_stmt_close($stmt);
     return $row ?: null;
 }

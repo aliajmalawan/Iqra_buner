@@ -19,7 +19,7 @@ $stmt = mysqli_prepare($conn, 'SELECT photo FROM support_staff WHERE id = ?');
 $id = (int) ($_GET['id'] ?? 0);
 mysqli_stmt_bind_param($stmt, 'i', $id);
 mysqli_stmt_execute($stmt);
-$row = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+$row = db_fetch_assoc(db_stmt_result($stmt));
 $path = $row['photo'] ?? '';
 $file = __DIR__ . '/../' . $path;
 

@@ -51,10 +51,10 @@ function staffQuery($conn, $sql, $types = '', $args = []) {
     $stmt = mysqli_prepare($conn, $sql);
     if ($types !== '') mysqli_stmt_bind_param($stmt, $types, ...$args);
     mysqli_stmt_execute($stmt);
-    return mysqli_stmt_get_result($stmt);
+    return db_stmt_result($stmt);
 }
 function staffFetch($conn, $id) {
-    $r = mysqli_fetch_assoc(staffQuery($conn, 'SELECT * FROM support_staff WHERE id = ?', 'i', [$id]));
+    $r = db_fetch_assoc(staffQuery($conn, 'SELECT * FROM support_staff WHERE id = ?', 'i', [$id]));
     return $r ?: null;
 }
 function staffUrl($extra = []) {
@@ -82,7 +82,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
         header('Location: manage_support_staff.php?msg=' . urlencode('The export could not be created. Please try again.') . '&err=1');
         exit;
     }
-    audit_log($conn, 'export', 'support_staff', null, 'CSV export of ' . mysqli_num_rows($res) . ' record(s) incl. CNIC/phone' . (array_filter($flt, 'strlen') ? ' (filtered)' : ''));
+    audit_log($conn, 'export', 'support_staff', null, 'CSV export of ' . db_num_rows($res) . ' record(s) incl. CNIC/phone' . (array_filter($flt, 'strlen') ? ' (filtered)' : ''));
     header('Content-Type: text/csv; charset=UTF-8');
     header('Content-Disposition: attachment; filename="iqra-support-staff-' . date('Y-m-d') . '.csv"');
     header('Cache-Control: no-store');
@@ -91,7 +91,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     $safe = function ($v) { $v = (string) $v; return preg_match('/^[=+\-@\t\r]/', $v) ? "'" . $v : $v; };
     fputcsv($out, ['Employee ID', 'Full Name', "Father's Name", 'CNIC', 'Mobile', 'Address', 'Category', 'Designation', 'Campus',
                    'Joining Date', 'Employment Status', 'Record', 'Emergency Contact', 'Emergency Phone']);
-    while ($r = mysqli_fetch_assoc($res)) {
+    while ($r = db_fetch_assoc($res)) {
         fputcsv($out, array_map($safe, [$r['employee_id'], $r['full_name'], $r['father_name'], $r['cnic'], $r['mobile'], $r['address'],
             STAFF_CATEGORIES[$r['category']] ?? $r['category'], $r['designation'], $r['campus'], $r['joining_date'],
             STAFF_EMPLOYMENT[$r['employment_status']] ?? $r['employment_status'], $r['is_active'] ? 'Active' : 'Inactive',
@@ -195,15 +195,15 @@ if (isset($_GET['edit']) && $full) {
 
 $counts = ['all' => 0, 'active' => 0, 'inactive' => 0];
 $res = mysqli_query($conn, "SELECT is_active, COUNT(*) c FROM support_staff GROUP BY is_active");
-while ($res && ($r = mysqli_fetch_assoc($res))) { $counts[$r['is_active'] ? 'active' : 'inactive'] = (int) $r['c']; $counts['all'] += (int) $r['c']; }
+while ($res && ($r = db_fetch_assoc($res))) { $counts[$r['is_active'] ? 'active' : 'inactive'] = (int) $r['c']; $counts['all'] += (int) $r['c']; }
 $cat_counts = [];
 $res = mysqli_query($conn, "SELECT category, COUNT(*) c FROM support_staff WHERE is_active = 1 GROUP BY category");
-while ($res && ($r = mysqli_fetch_assoc($res))) $cat_counts[$r['category']] = (int) $r['c'];
+while ($res && ($r = db_fetch_assoc($res))) $cat_counts[$r['category']] = (int) $r['c'];
 
 $per_page = 25;
 $page = max(1, (int) ($_GET['page'] ?? 1));
 [$where, $types, $args] = staffWhere($flt, $full);
-$total = (int) mysqli_fetch_row(staffQuery($conn, "SELECT COUNT(*) FROM support_staff $where", $types, $args))[0];
+$total = (int) db_fetch_row(staffQuery($conn, "SELECT COUNT(*) FROM support_staff $where", $types, $args))[0];
 $pages = max(1, (int) ceil($total / $per_page));
 $page = min($page, $pages);
 $offset = ($page - 1) * $per_page;
@@ -507,7 +507,7 @@ function staffAvatar($row, $h) {
         <table class="data-table">
             <thead><tr><th>Staff Member</th><th>Employee ID</th><th>Category / Designation</th><th>CNIC &amp; Mobile</th><th>Employment</th><th>Record</th><th>Actions</th></tr></thead>
             <tbody>
-            <?php $n = 0; while ($s = mysqli_fetch_assoc($rows)): $n++;
+            <?php $n = 0; while ($s = db_fetch_assoc($rows)): $n++;
                 $emp = $s['employment_status'];
                 $emp_cls = in_array($emp, ['resigned', 'retired', 'terminated'], true) ? ' bad' : ($emp === 'on_leave' ? ' warn' : ''); ?>
                 <tr>

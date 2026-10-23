@@ -47,7 +47,7 @@ function alumniQuery($conn, $sql, $types = '', $args = []) {
     $stmt = mysqli_prepare($conn, $sql);
     if ($types !== '') mysqli_stmt_bind_param($stmt, $types, ...$args);
     mysqli_stmt_execute($stmt);
-    return mysqli_stmt_get_result($stmt);
+    return db_stmt_result($stmt);
 }
 function alumniUrl($extra = []) {
     global $flt;
@@ -63,7 +63,7 @@ function alumniBack($msg, $err = false) {
     exit;
 }
 function alumniFetch($conn, $id) {
-    $row = mysqli_fetch_assoc(alumniQuery($conn, 'SELECT * FROM alumni WHERE id = ?', 'i', [$id]));
+    $row = db_fetch_assoc(alumniQuery($conn, 'SELECT * FROM alumni WHERE id = ?', 'i', [$id]));
     return $row ?: null;
 }
 
@@ -78,7 +78,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
         header('Location: manage_alumni.php?msg=' . urlencode('The export could not be created. Please try again.') . '&err=1');
         exit;
     }
-    audit_log($conn, 'export', 'alumni', null, 'CSV export of ' . mysqli_num_rows($res) . ' record(s)' . (array_filter($flt) ? ' (filtered)' : ''));
+    audit_log($conn, 'export', 'alumni', null, 'CSV export of ' . db_num_rows($res) . ' record(s)' . (array_filter($flt) ? ' (filtered)' : ''));
     header('Content-Type: text/csv; charset=UTF-8');
     header('Content-Disposition: attachment; filename="iqra-alumni-' . date('Y-m-d') . '.csv"');
     header('Cache-Control: no-store');
@@ -87,7 +87,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     $safe = function ($v) { $v = (string) $v; return preg_match('/^[=+\-@\t\r]/', $v) ? "'" . $v : $v; }; // no formula injection
     fputcsv($out, ['ID', 'Full Name', "Father's Name", 'Email', 'Mobile', 'WhatsApp', 'Passing Year', 'Last Class / Program',
                    'Occupation', 'Organization', 'City', 'Country', 'Show in Directory', 'Status', 'Additional Information', 'Admin Notes', 'Registered On']);
-    while ($r = mysqli_fetch_assoc($res)) {
+    while ($r = db_fetch_assoc($res)) {
         fputcsv($out, array_map($safe, [$r['id'], $r['student_name'], $r['father_name'], $r['email'], $r['mobile_number'], $r['whatsapp_number'],
             $r['passing_year'], $r['course'], $r['current_job'], $r['job_department'], $r['job_city'], $r['country'],
             $r['show_public'] ? 'Yes' : 'No', ucfirst($r['status']), $r['review'], $r['admin_notes'], $r['created_at']]));
@@ -217,18 +217,18 @@ if ($edit_id !== null && $can_manage) {
 
 $counts = ['all' => 0, 'pending' => 0, 'approved' => 0, 'rejected' => 0];
 $res = mysqli_query($conn, "SELECT status, COUNT(*) c FROM alumni GROUP BY status");
-while ($res && ($r = mysqli_fetch_assoc($res))) { $counts[$r['status']] = (int) $r['c']; $counts['all'] += (int) $r['c']; }
+while ($res && ($r = db_fetch_assoc($res))) { $counts[$r['status']] = (int) $r['c']; $counts['all'] += (int) $r['c']; }
 $years = [];
 $res = mysqli_query($conn, "SELECT DISTINCT passing_year FROM alumni ORDER BY passing_year DESC");
-while ($res && ($r = mysqli_fetch_row($res))) $years[] = (int) $r[0];
+while ($res && ($r = db_fetch_row($res))) $years[] = (int) $r[0];
 $programs = [];
 $res = mysqli_query($conn, "SELECT DISTINCT course FROM alumni ORDER BY course");
-while ($res && ($r = mysqli_fetch_row($res))) $programs[] = $r[0];
+while ($res && ($r = db_fetch_row($res))) $programs[] = $r[0];
 
 $per_page = 20;
 $page = max(1, (int) ($_GET['page'] ?? 1));
 [$where, $types, $args] = alumniWhere($flt);
-$total = (int) mysqli_fetch_row(alumniQuery($conn, "SELECT COUNT(*) FROM alumni $where", $types, $args))[0];
+$total = (int) db_fetch_row(alumniQuery($conn, "SELECT COUNT(*) FROM alumni $where", $types, $args))[0];
 $pages = max(1, (int) ceil($total / $per_page));
 $page = min($page, $pages);
 $offset = ($page - 1) * $per_page;
@@ -508,7 +508,7 @@ function alumniStatusForm($id, $status, $return, $with_text = false) {
                     <th>Alumnus</th><th>Program &amp; Year</th><th>Occupation</th><th>Contact</th><th>Status</th><th>Actions</th>
                 </tr></thead>
                 <tbody>
-                <?php $n = 0; while ($a = mysqli_fetch_assoc($rows)): $n++; ?>
+                <?php $n = 0; while ($a = db_fetch_assoc($rows)): $n++; ?>
                     <tr>
                         <td><input type="checkbox" name="ids[]" value="<?php echo (int) $a['id']; ?>" aria-label="Select <?php echo $h($a['student_name']); ?>"></td>
                         <td><div class="al-person">

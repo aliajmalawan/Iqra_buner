@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/db_compat.php';
 /**
  * Settings Helper Functions
  * Use these functions to fetch dynamic settings from database

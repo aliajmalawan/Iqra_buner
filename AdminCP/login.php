@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt = mysqli_prepare($conn, "SELECT * FROM admin_users WHERE username = ? AND status = 'active' LIMIT 1");
     mysqli_stmt_bind_param($stmt, 's', $username);
     mysqli_stmt_execute($stmt);
-    $admin = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+    $admin = db_fetch_assoc(db_stmt_result($stmt));
     mysqli_stmt_close($stmt);
     $who = $admin ? ['id' => $admin['id'], 'username' => $admin['username'], 'role' => $admin['role']] : ['id' => null, 'username' => mb_substr($username, 0, 50), 'role' => ''];
 
