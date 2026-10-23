@@ -19,9 +19,12 @@ CREATE TABLE IF NOT EXISTS admin_users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Insert default admin user (username: admin, password: admin123)
-INSERT INTO admin_users (username, password, full_name, email, role)
-VALUES ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'System Administrator', 'admin@forteducation.com', 'super_admin');
+-- SECURITY: the old template created a default admin here with a publicly known
+-- password. It is disabled so importing this file can never add a known login.
+-- Create admin accounts with a strong password instead (AdminCP or phpMyAdmin with
+-- a password_hash() value).
+-- INSERT INTO admin_users (username, password, full_name, email, role)
+-- VALUES ('admin', '<password_hash>', 'System Administrator', 'admin@example.com', 'super_admin');
 
 -- Courses Table
 CREATE TABLE IF NOT EXISTS courses (

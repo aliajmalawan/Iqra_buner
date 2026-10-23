@@ -14,7 +14,9 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 require_once __DIR__ . '/includes/csrf.php';
 csrf_guard();
 
-$valid_tabs = ['events', 'societies', 'news', 'alumni', 'alumni_reviews'];
+// Alumni registrations now live in AdminCP > Alumni Portal (manage_alumni.php)
+if (($_GET['tab'] ?? '') === 'alumni') { header('Location: manage_alumni.php'); exit; }
+$valid_tabs = ['events', 'societies', 'news', 'alumni_reviews'];
 $active_tab = isset($_GET['tab']) && in_array($_GET['tab'], $valid_tabs) ? $_GET['tab'] : 'events';
 $message = isset($_GET['msg']) ? $_GET['msg'] : '';
 $is_error = isset($_GET['err']) && $_GET['err'] == '1';
@@ -303,7 +305,6 @@ $tab_labels = [
     'events' => ['icon' => 'fas fa-calendar-alt', 'label' => 'Events & Activities'],
     'societies' => ['icon' => 'fas fa-people-group', 'label' => 'Student Societies'],
     'news' => ['icon' => 'fas fa-newspaper', 'label' => 'News'],
-    'alumni' => ['icon' => 'fas fa-user-graduate', 'label' => 'Alumni'],
     'alumni_reviews' => ['icon' => 'fas fa-star', 'label' => 'Alumni Reviews'],
 ];
 ?>

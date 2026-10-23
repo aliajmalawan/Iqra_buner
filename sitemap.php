@@ -27,6 +27,8 @@ $pages = [
     ['url' => 'news.php', 'priority' => '0.7', 'changefreq' => 'weekly'],
     ['url' => 'notifications.php', 'priority' => '0.5', 'changefreq' => 'weekly'],
     ['url' => 'alumni.php', 'priority' => '0.6', 'changefreq' => 'monthly'],
+    ['url' => 'parents-portal.php', 'priority' => '0.6', 'changefreq' => 'monthly'],
+    ['url' => 'parents-login.php', 'priority' => '0.6', 'changefreq' => 'monthly'],
     ['url' => 'gallery.php', 'priority' => '0.6', 'changefreq' => 'monthly'],
     ['url' => 'contact.php', 'priority' => '0.7', 'changefreq' => 'yearly'],
 ];

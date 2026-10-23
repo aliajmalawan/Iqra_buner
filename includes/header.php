@@ -55,208 +55,145 @@ $_seoCanonical = rtrim(SITE_URL, '/') . '/' . basename($_SERVER['SCRIPT_NAME'] ?
     <link rel="icon" type="image/png" href="<?php echo getLogoPath(); ?>">
 </head>
 <body>
-    <!-- Header -->
-    <header id="main-header">
-
-        <!-- ===== BRAND BAR (logo, contact, primary actions) ===== -->
-        <div class="brand-bar">
-            <div class="container">
-                <!-- Left: Logo + Name + Tagline -->
-                <a href="index.php" class="brand-identity">
-                    <img src="<?php echo getLogoPath(); ?>" alt="<?php echo getSiteName(); ?> Logo" onerror="this.style.display='none'">
-                    <div class="brand-text">
-                        <span class="brand-name"><?php echo getSiteName(); ?></span>
-                        <span class="brand-tagline">Excellence in Education</span>
-                    </div>
+    <!-- Header: two tiers (white brand/contact bar, navy centred menu below), sticky on every page.
+         Layout mirrors the Tameer-e-Nau header, in IQRA's navy / cyan / gold colours. -->
+    <?php
+    $hx_page  = basename($_SERVER['SCRIPT_NAME']);
+    $hx_phone = trim(explode(',', getSitePhone())[0]);
+    $hx_email = getSiteEmail();
+    $hx_social = array_filter(getSocialMedia());
+    $hx_menu  = getNavMenu();
+    $hx_url_page = function ($url) { return basename(strtok((string) $url, '?#')); };
+    ?>
+    <header class="hx-header" id="site-header">
+        <div class="hx-topbar">
+            <div class="container hx-topbar-inner">
+                <a class="hx-brand" href="index.php" aria-label="<?php echo htmlspecialchars(getSiteName()); ?> - Home">
+                    <img src="<?php echo getLogoPath(); ?>" alt="" class="hx-brand-logo" width="56" height="56" onerror="this.style.display='none'">
+                    <span class="hx-brand-text">
+                        <strong><?php echo htmlspecialchars(getSiteName()); ?></strong>
+                        <small><?php echo htmlspecialchars(getSetting('header_tagline', 'Daggar, District Buner')); ?></small>
+                    </span>
                 </a>
 
-                <!-- Right: Contact + Social + Campus Login + Apply Now -->
-                <div class="brand-right">
-                    <?php
-                    $phone = getSitePhone();
-                    $phone_numbers = explode(',', $phone);
-                    $first_phone = trim($phone_numbers[0]);
-                    $first_phone_href = str_replace([' ', '-'], '', $first_phone);
-                    ?>
-                    <div class="brand-contact">
-                        <a href="tel:<?php echo $first_phone_href; ?>">
-                            <span class="brand-contact-icon"><i class="fas fa-phone-alt"></i></span>
-                            <span class="brand-contact-text"><small>Call Us</small><?php echo $first_phone; ?></span>
-                        </a>
-                        <span class="brand-contact-sep"></span>
-                        <a href="mailto:<?php echo getSiteEmail(); ?>">
-                            <span class="brand-contact-icon"><i class="fas fa-envelope"></i></span>
-                            <span class="brand-contact-text"><small>Email Us</small><?php echo getSiteEmail(); ?></span>
-                        </a>
-                    </div>
-                    <div class="brand-actions">
-                        <?php
-                        $social  = getSocialMedia();
-                        $fb_url  = !empty($social['facebook'])  ? htmlspecialchars($social['facebook'])  : '#';
-                        $ig_url  = !empty($social['instagram']) ? htmlspecialchars($social['instagram']) : '#';
-                        $yt_url  = !empty($social['youtube'])   ? htmlspecialchars($social['youtube'])   : '#';
-                        $fb_target = $fb_url !== '#' ? 'target="_blank"' : '';
-                        $ig_target = $ig_url !== '#' ? 'target="_blank"' : '';
-                        $yt_target = $yt_url !== '#' ? 'target="_blank"' : '';
-                        ?>
-                        <div class="brand-social">
-                            <a href="<?php echo $fb_url; ?>" <?php echo $fb_target; ?> title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                            <a href="<?php echo $ig_url; ?>" <?php echo $ig_target; ?> title="Instagram"><i class="fab fa-instagram"></i></a>
-                            <a href="<?php echo $yt_url; ?>" <?php echo $yt_target; ?> title="YouTube"><i class="fab fa-youtube"></i></a>
-                            <?php if (!empty($social['twitter'])): ?>
-                            <a href="<?php echo htmlspecialchars($social['twitter']); ?>" target="_blank" title="Twitter"><i class="fab fa-x-twitter"></i></a>
-                            <?php endif; ?>
-                        </div>
-                        <a href="campus-portal.php" class="campus-login-btn">
-                            <i class="fas fa-sign-in-alt"></i> Campus Login
-                        </a>
-                        <a href="admission.php" class="apply-now-btn">
-                            Apply Now <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
+                <div class="hx-info-group">
+                    <?php if ($hx_phone !== ''): ?>
+                    <a class="hx-info" href="tel:<?php echo htmlspecialchars(preg_replace('/[^+0-9]/', '', $hx_phone)); ?>">
+                        <span class="hx-info-icon"><i class="fas fa-phone" aria-hidden="true"></i></span>
+                        <span><small>Call Us</small><strong><?php echo htmlspecialchars($hx_phone); ?></strong></span>
+                    </a>
+                    <?php endif; ?>
+                    <?php if ($hx_email !== ''): ?>
+                    <a class="hx-info" href="mailto:<?php echo htmlspecialchars($hx_email); ?>">
+                        <span class="hx-info-icon"><i class="fas fa-envelope" aria-hidden="true"></i></span>
+                        <span><small>Email Us</small><strong><?php echo htmlspecialchars($hx_email); ?></strong></span>
+                    </a>
+                    <?php endif; ?>
+                </div>
 
-                    <!-- Mobile Hamburger -->
-                    <button type="button" class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-controls="navLinks" aria-expanded="false">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                <div class="hx-actions">
+                    <?php if ($hx_social): ?>
+                    <nav class="hx-social" aria-label="Social media">
+                        <?php foreach (['facebook' => 'fa-facebook-f', 'instagram' => 'fa-instagram', 'youtube' => 'fa-youtube', 'twitter' => 'fa-x-twitter'] as $net => $ico):
+                            if (empty($hx_social[$net])) continue; ?>
+                        <a href="<?php echo htmlspecialchars($hx_social[$net]); ?>" target="_blank" rel="noopener" aria-label="<?php echo ucfirst($net); ?>"><i class="fab <?php echo $ico; ?>" aria-hidden="true"></i></a>
+                        <?php endforeach; ?>
+                    </nav>
+                    <?php endif; ?>
+
+                    <a class="hx-apply-btn" href="admission.php"><i class="fas fa-pen-to-square" aria-hidden="true"></i> Apply Online</a>
+
+                    <button type="button" class="hx-toggle" id="hx-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="hx-nav">
+                        <span class="hx-toggle-bar"></span>
+                        <span class="hx-toggle-bar"></span>
+                        <span class="hx-toggle-bar"></span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- ===== NAVIGATION BAR ===== -->
-        <nav id="main-nav" aria-label="Main navigation">
-            <div class="container">
-                <ul class="nav-links" id="navLinks">
-                    <?php foreach (getNavMenu() as $nav_item): ?>
-                        <?php if (!empty($nav_item['children'])): ?>
-                        <li class="dropdown">
-                            <a href="<?php echo htmlspecialchars($nav_item['url']); ?>" class="dropdown-toggle"<?php echo $nav_item['open_new_tab'] ? ' target="_blank"' : ''; ?>>
-                                <i class="fas <?php echo htmlspecialchars($nav_item['icon']); ?>"></i>
-                                <span><?php echo htmlspecialchars($nav_item['label']); ?> <i class="fas fa-chevron-down chev"></i></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <?php foreach ($nav_item['children'] as $child): ?>
-                                <li><a href="<?php echo htmlspecialchars($child['url']); ?>"<?php echo $child['open_new_tab'] ? ' target="_blank"' : ''; ?>><i class="fas <?php echo htmlspecialchars($child['icon']); ?>"></i> <?php echo htmlspecialchars($child['label']); ?></a></li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </li>
-                        <?php else: ?>
-                        <li>
-                            <a href="<?php echo htmlspecialchars($nav_item['url']); ?>"<?php echo $nav_item['open_new_tab'] ? ' target="_blank"' : ''; ?>>
-                                <i class="fas <?php echo htmlspecialchars($nav_item['icon']); ?>"></i>
-                                <span><?php echo htmlspecialchars($nav_item['label']); ?></span>
-                            </a>
-                        </li>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
+        <div class="hx-backdrop" id="hx-backdrop"></div>
 
-                    <!-- Mobile-only: actions + contact shown at the bottom of the menu panel -->
-                    <li class="nav-mobile-extras">
-                        <div class="nav-mobile-actions">
-                            <a href="admission.php" class="apply-now-btn">Apply Now <i class="fas fa-arrow-right"></i></a>
-                            <a href="campus-portal.php" class="campus-login-btn"><i class="fas fa-sign-in-alt"></i> Campus Login</a>
+        <nav class="hx-navbar" aria-label="Primary navigation">
+            <div class="container hx-navbar-inner">
+                <div class="hx-nav" id="hx-nav">
+                    <?php foreach ($hx_menu as $item):
+                        $ext = !empty($item['open_new_tab']) ? ' target="_blank" rel="noopener"' : '';
+                        if (empty($item['children'])):
+                            $on = $hx_url_page($item['url']) === $hx_page; ?>
+                    <a href="<?php echo htmlspecialchars($item['url']); ?>"<?php echo $ext; ?><?php echo $on ? ' class="is-active" aria-current="page"' : ''; ?>><?php echo htmlspecialchars($item['label']); ?></a>
+                    <?php else:
+                            $group_on = false;
+                            foreach ($item['children'] as $ch) { if ($hx_url_page($ch['url']) === $hx_page) $group_on = true; } ?>
+                    <div class="hx-dropdown<?php echo $group_on ? ' is-active' : ''; ?>">
+                        <span class="hx-dropdown-trigger" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false"><?php echo htmlspecialchars($item['label']); ?> <i class="fas fa-chevron-down hx-caret" aria-hidden="true"></i></span>
+                        <div class="hx-dropdown-panel">
+                            <?php foreach ($item['children'] as $ch):
+                                $c_on = $hx_url_page($ch['url']) === $hx_page;
+                                $c_ext = !empty($ch['open_new_tab']) ? ' target="_blank" rel="noopener"' : ''; ?>
+                            <a href="<?php echo htmlspecialchars($ch['url']); ?>"<?php echo $c_ext; ?><?php echo $c_on ? ' class="is-active" aria-current="page"' : ''; ?>><?php echo htmlspecialchars($ch['label']); ?></a>
+                            <?php endforeach; ?>
                         </div>
-                        <div class="nav-mobile-contact">
-                            <a href="tel:<?php echo $first_phone_href; ?>"><i class="fas fa-phone-alt"></i> <?php echo $first_phone; ?></a>
-                            <a href="mailto:<?php echo getSiteEmail(); ?>"><i class="fas fa-envelope"></i> <?php echo getSiteEmail(); ?></a>
-                        </div>
-                    </li>
-                </ul>
+                    </div>
+                    <?php endif; endforeach; ?>
+
+                    <a class="btn btn-accent hx-drawer-apply" href="admission.php">Apply Online</a>
+                </div>
             </div>
         </nav>
-
     </header>
 
     <script>
-    (function() {
-        var header  = document.getElementById('main-header');
-        var toggle  = document.getElementById('menuToggle');
-        var navList = document.getElementById('navLinks');
-        var MOBILE_BP = 1024; // keep in sync with the header @media breakpoint in css/style.css
+    // Header: shadow on scroll, mobile drawer + dropdowns (same behaviour as the Tameer-e-Nau header)
+    (function () {
+        var header = document.getElementById('site-header');
+        var toggle = document.getElementById('hx-toggle');
+        var nav = document.getElementById('hx-nav');
+        var backdrop = document.getElementById('hx-backdrop');
+        var DRAWER_MAX = 900;   // keep in sync with the @media (max-width: 900px) header rules in css/style.css
 
-        // Scroll elevation + compact brand bar (hysteresis avoids flicker
-        // when the shrinking header changes the page height)
-        window.addEventListener('scroll', function() {
-            var y = window.scrollY;
-            if (y > 60) header.classList.add('scrolled');
-            else if (y < 10) header.classList.remove('scrolled');
-        }, { passive: true });
+        function shadow() { header.classList.toggle('is-scrolled', window.scrollY > 10); }
+        shadow();
+        window.addEventListener('scroll', shadow, { passive: true });
+        if (!toggle || !nav) return;
 
-        function setMenu(open) {
-            toggle.classList.toggle('active', open);
-            navList.classList.toggle('active', open);
-            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-            toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-            document.documentElement.classList.toggle('nav-open', open);
-            if (!open) {
-                document.querySelectorAll('#navLinks .dropdown.open').forEach(function(d) {
-                    d.classList.remove('open');
-                });
-            }
+        function setOpen(open) {
+            nav.classList.toggle('is-open', open);
+            toggle.classList.toggle('is-open', open);
+            if (backdrop) backdrop.classList.toggle('is-open', open);
+            header.classList.toggle('nav-open', open);   // lifts the brand bar so the close (X) button stays visible
+            toggle.setAttribute('aria-expanded', String(open));
+            toggle.setAttribute('aria-label', open ? 'Close menu' : 'Toggle menu');
+            document.body.style.overflow = open ? 'hidden' : '';
+            if (!open) nav.querySelectorAll('.hx-dropdown').forEach(function (d) { d.classList.remove('is-open'); });
         }
+        toggle.addEventListener('click', function () { setOpen(!nav.classList.contains('is-open')); });
+        if (backdrop) backdrop.addEventListener('click', function () { setOpen(false); });
 
-        // Hamburger toggle
-        if (toggle) {
-            toggle.addEventListener('click', function() {
-                setMenu(!navList.classList.contains('active'));
+        // Dropdown groups expand inline inside the drawer; on desktop they open on hover/focus (CSS)
+        nav.querySelectorAll('.hx-dropdown-trigger').forEach(function (trigger) {
+            var group = trigger.closest('.hx-dropdown');
+            function toggleGroup() {
+                if (window.innerWidth > DRAWER_MAX) return;
+                var open = !group.classList.contains('is-open');
+                group.classList.toggle('is-open', open);
+                trigger.setAttribute('aria-expanded', String(open));
+            }
+            trigger.addEventListener('click', toggleGroup);
+            trigger.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleGroup(); }
             });
+        });
+
+        // Close the drawer after choosing a link, on Escape, or when resizing up to desktop
+        nav.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { setOpen(false); }); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && nav.classList.contains('is-open')) { setOpen(false); toggle.focus(); } });
+        window.addEventListener('resize', function () { if (window.innerWidth > DRAWER_MAX) setOpen(false); });
+
+        // Open the current page's group inside the drawer
+        if (window.innerWidth <= DRAWER_MAX) {
+            var active = nav.querySelector('.hx-dropdown.is-active');
+            if (active) active.classList.add('is-open');
         }
-
-        // Mobile: dropdown click toggle (accordion — one section open at a time)
-        document.querySelectorAll('#navLinks .dropdown > a').forEach(function(a) {
-            a.setAttribute('aria-haspopup', 'true');
-            a.addEventListener('click', function(e) {
-                if (window.innerWidth <= MOBILE_BP) {
-                    e.preventDefault();
-                    var li = this.closest('.dropdown');
-                    var willOpen = !li.classList.contains('open');
-                    document.querySelectorAll('#navLinks .dropdown.open').forEach(function(d) {
-                        if (d !== li) d.classList.remove('open');
-                    });
-                    li.classList.toggle('open', willOpen);
-                }
-            });
-        });
-
-        // Close nav when clicking outside, pressing Escape, or resizing to desktop
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('#main-header')) setMenu(false);
-        });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && navList.classList.contains('active')) {
-                setMenu(false);
-                toggle.focus();
-            }
-        });
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > MOBILE_BP && navList.classList.contains('active')) setMenu(false);
-        });
-
-        // Highlight active nav link (top-level link, or dropdown toggle whose submenu contains the current page)
-        var path = window.location.pathname.split('/').pop() || 'index.php';
-        document.querySelectorAll('#navLinks > li').forEach(function(li) {
-            var topLink = li.querySelector(':scope > a');
-            var subLinks = li.querySelectorAll('.dropdown-menu a');
-            var isActive = false;
-
-            if (topLink) {
-                var href = (topLink.getAttribute('href') || '').split('?')[0];
-                if (href === path || (path === '' && href === 'index.php')) isActive = true;
-            }
-            subLinks.forEach(function(sub) {
-                var subHref = (sub.getAttribute('href') || '').split('?')[0];
-                if (subHref === path) {
-                    isActive = true;
-                    sub.classList.add('active');
-                    sub.setAttribute('aria-current', 'page');
-                }
-            });
-
-            if (isActive && topLink) {
-                topLink.classList.add('active');
-            }
-        });
     })();
     </script>

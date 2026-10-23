@@ -67,6 +67,12 @@ if ($gallery_count) {
     $stats['gallery_images'] = mysqli_fetch_assoc($gallery_count)['count'];
 }
 
+$alumni_pending = 0;
+$alumni_count = mysqli_query($conn, "SELECT COUNT(*) AS count FROM alumni WHERE status = 'pending'");
+if ($alumni_count) {
+    $alumni_pending = (int) mysqli_fetch_assoc($alumni_count)['count'];
+}
+
 // Get recent admissions (with the course name, not just its id)
 $recent_admissions = mysqli_query($conn, "SELECT a.*, COALESCE(c.name, a.course_id) AS course_name
                                           FROM admissions a
@@ -84,7 +90,7 @@ $stat_cards = [
     ['manage_admission.php?tab=applications', 'fa-user-check',         $stats['approved_admissions'], 'Approved Students'],
     ['manage_contact.php?tab=messages',       'fa-envelope',           $stats['unread_contacts'],     'Unread Messages', $stats['unread_contacts'] > 0],
     ['manage_student_life.php?tab=events',    'fa-calendar-days',      $stats['total_events'],        'Active Events'],
-    ['manage_student_life.php?tab=news',      'fa-newspaper',          $stats['total_news'],          'Published News'],
+    ['manage_alumni.php?status=pending',      'fa-user-graduate',      $alumni_pending,               'Pending Alumni', $alumni_pending > 0],
     ['manage_gallery.php',                    'fa-images',             $stats['gallery_images'],      'Gallery Images'],
 ];
 $quick_actions = [
@@ -93,6 +99,7 @@ $quick_actions = [
     ['manage_student_life.php?tab=events', 'fa-calendar-plus',  'Add Event',     'Create a new event'],
     ['manage_student_life.php?tab=news',   'fa-bullhorn',       'Publish News',  'Post an announcement'],
     ['manage_gallery.php',                 'fa-image',          'Upload Image',  'Add photos to the gallery'],
+    ['manage_alumni.php',                  'fa-user-graduate',  'Alumni Portal', 'Review alumni registrations'],
     ['settings.php',                       'fa-gear',           'Settings',      'Name, contact & social links'],
 ];
 ?>

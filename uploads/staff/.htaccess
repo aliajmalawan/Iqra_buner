@@ -1,0 +1,3 @@
+# Support-staff photos are personal data: no direct web access.
+# Logged-in admins see them through AdminCP/staff_photo.php.
+Require all denied

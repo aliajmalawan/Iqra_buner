@@ -24,14 +24,22 @@ $__nav_groups = [
     'Admissions' => [
         ['manage_admission.php',     'fa-user-graduate',       'Admission'],
         ['manage_students.php',      'fa-id-card',             'Students'],
+        ['manage_alumni.php',        'fa-user-graduate',       'Alumni Portal'],
+    ],
+    'Staff' => [
+        ['manage_support_staff.php', 'fa-people-carry-box',    'Support Staff'],
     ],
     'System' => [
         ['menu_builder.php',         'fa-bars',                'Menu Builder'],
         ['settings.php',             'fa-gear',                'Settings'],
         ['theme_manager.php',        'fa-palette',             'Theme Manager'],
-        ['manage_erp.php',           'fa-network-wired',       'ERP Integration'],
+        ['manage_erp.php',           'fa-network-wired',       'EduPortal & ERP'],
     ],
 ];
+// Audit log: administrators only (the page itself also enforces this)
+if (in_array($_SESSION['admin_role'] ?? 'admin', ['super_admin', 'admin'], true)) {
+    $__nav_groups['System'][] = ['audit_log.php', 'fa-clipboard-list', 'Audit Log'];
+}
 $__logo = getLogoPath();
 ?>
 <!-- Mobile / tablet top bar (hidden on desktop) -->
@@ -74,6 +82,12 @@ $__logo = getLogoPath();
     </nav>
 
     <div class="sidebar-footer">
+        <?php $__edu = getEduPortalLinks(); if ($__edu['admin']): ?>
+        <a href="<?php echo htmlspecialchars($__edu['admin']); ?>" target="_blank" rel="noopener noreferrer">
+            <i class="fas fa-user-shield" aria-hidden="true"></i>
+            <span>Open EduPortal</span>
+        </a>
+        <?php endif; ?>
         <a href="../index.php" target="_blank" rel="noopener">
             <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
             <span>View Website</span>
@@ -135,6 +149,23 @@ $__logo = getLogoPath();
     // keep the active item in view inside a long menu
     var active = sidebar.querySelector('.sidebar-menu a.active');
     if (active) active.scrollIntoView({ block: 'nearest' });
+
+    // Submit feedback: spinner on the clicked button + double-submit guard. The button stays
+    // enabled (disabled buttons are left out of POST data — several handlers check isset($_POST[...])).
+    document.addEventListener('submit', function (e) {
+        var form = e.target;
+        if (e.defaultPrevented || !(form instanceof HTMLFormElement)) return;     // e.g. a cancelled confirm()
+        if ((form.method || 'get').toLowerCase() !== 'post') return;               // filters / searches: no spinner
+        if (form.dataset.submitting === '1') { e.preventDefault(); return; }
+        form.dataset.submitting = '1';
+        var btn = e.submitter || form.querySelector('[type="submit"]');
+        if (btn && btn.classList) { btn.classList.add('is-loading'); btn.setAttribute('aria-busy', 'true'); }
+    });
+    // Back/forward cache: never show a stuck spinner
+    window.addEventListener('pageshow', function () {
+        document.querySelectorAll('form[data-submitting]').forEach(function (f) { delete f.dataset.submitting; });
+        document.querySelectorAll('.is-loading[aria-busy]').forEach(function (b) { b.classList.remove('is-loading'); b.removeAttribute('aria-busy'); });
+    });
 
     function wrapTables() {
         document.querySelectorAll('.main-content table').forEach(function(t) {

@@ -232,10 +232,9 @@ if ($news_result) while ($row = mysqli_fetch_assoc($news_result)) $news_items[] 
         <h2>Stay Connected!</h2>
         <p>Follow us on social media to never miss an update</p>
         <div class="social-links" style="justify-content:center; position:relative; z-index:1;">
-            <a href="https://www.facebook.com/forteducationsystem/" target="_blank"><i class="fab fa-facebook"></i></a>
-            <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
-            <a href="#" target="_blank"><i class="fab fa-youtube"></i></a>
-            <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+            <?php $ev_social = getSocialMedia(); foreach (['facebook' => 'fa-facebook', 'instagram' => 'fa-instagram', 'youtube' => 'fa-youtube', 'twitter' => 'fa-x-twitter'] as $net => $ico): if (empty($ev_social[$net])) continue; ?>
+            <a href="<?php echo htmlspecialchars($ev_social[$net]); ?>" target="_blank" rel="noopener" aria-label="<?php echo ucfirst($net); ?>"><i class="fab <?php echo $ico; ?>" aria-hidden="true"></i></a>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>

@@ -32,3 +32,8 @@ tmpclaude-*
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Photos uploaded on the server by alumni / for support staff (personal data)
+uploads/alumni/*
+uploads/staff/*
+!uploads/staff/.htaccess

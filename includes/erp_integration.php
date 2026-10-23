@@ -25,6 +25,29 @@
  * actual API contract once it is provided.
  */
 
+/**
+ * EduPortal login links (AdminCP > ERP Integration > EduPortal Login Links).
+ * EduPortal runs on its own server (apps.eduportal.pk); the website only links
+ * to its login pages — no credentials are stored or passed here.
+ *  - 'admin'  : the "Admin Portal" button (header, mobile menu, footer, AdminCP)
+ *  - 'campus' : the student/staff "Campus Login" page (campus-portal.php)
+ *  - 'parents': the "Parents Portal" button. No official URL is known yet, so it is
+ *               empty by default and the button opens parents-portal.php instead.
+ * Only https:// URLs are used; anything else returns '' and the link is hidden.
+ */
+function eduportalCleanUrl($url) {
+    $url = trim((string) $url);
+    if ($url === '' || !filter_var($url, FILTER_VALIDATE_URL)) return '';
+    return strtolower((string) parse_url($url, PHP_URL_SCHEME)) === 'https' ? $url : '';
+}
+function getEduPortalLinks() {
+    return [
+        'admin'  => eduportalCleanUrl(getSetting('eduportal_admin_url', 'https://apps.eduportal.pk/Production/')),
+        'campus' => eduportalCleanUrl(getSetting('eduportal_campus_url', 'https://apps.eduportal.pk//Production/?aims=aims')),
+        'parents' => eduportalCleanUrl(getSetting('eduportal_parents_url', '')),
+    ];
+}
+
 function getErpConfig() {
     return [
         'enabled'  => getSetting('erp_enabled', '0') === '1',

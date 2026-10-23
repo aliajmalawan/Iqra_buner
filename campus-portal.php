@@ -2,6 +2,8 @@
 require_once 'includes/config.php';
 $page_title = 'Campus Portal';
 $page_description = 'Log in to the IQRA School & College Daggar Buner student portal to access your grades, attendance, fee status and academic records.';
+$eduportal = getEduPortalLinks();
+$campus_url = $eduportal['campus'] ?: $eduportal['admin'];
 ?>
 <?php include 'includes/header.php'; ?>
 
@@ -264,7 +266,7 @@ body { overflow-x: hidden; }
                     <i class="fas fa-rotate-right"></i>
                     <span>Refresh</span>
                 </button>
-                <a href="https://apps.eduportal.pk//Production/?aims=aims" target="_blank" class="portal-action-btn gold">
+                <a href="<?php echo htmlspecialchars($campus_url); ?>" target="_blank" rel="noopener" class="portal-action-btn gold">
                     <i class="fas fa-arrow-up-right-from-square"></i>
                     <span>Open Full Screen</span>
                 </a>
@@ -279,13 +281,15 @@ body { overflow-x: hidden; }
         <div class="portal-status-inner">
             <div class="portal-status-left">
                 <div class="portal-status-pill">
-                    <span class="portal-status-dot"></span>
-                    Portal Online
+                    <i class="fas fa-circle-check" style="color:var(--accent-color);font-size:11px;"></i>
+                    Official EduPortal Login
                 </div>
+                <?php if (stripos($campus_url, 'https://') === 0): ?>
                 <div class="portal-status-pill">
                     <i class="fas fa-shield-halved" style="color:var(--primary-color);font-size:11px;"></i>
-                    Secure Connection
+                    Encrypted (HTTPS)
                 </div>
+                <?php endif; ?>
             </div>
             <div class="portal-status-info">
                 <i class="fas fa-circle-info"></i>
@@ -307,7 +311,7 @@ body { overflow-x: hidden; }
     </div>
     <iframe
         id="portalFrame"
-        src="https://apps.eduportal.pk//Production/?aims=aims"
+        src="<?php echo htmlspecialchars($campus_url); ?>"
         title="IQRA Campus Portal"
         allow="fullscreen"
         onload="hideLoader()">

@@ -5,10 +5,21 @@ session_start([
     'cookie_secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
 ]);
 require_once '../includes/config.php';
+require_once '../includes/audit_helper.php';
+
+// Optional ?next=page.php (e.g. the homepage "Support Staff" card links to
+// login.php?next=manage_support_staff.php). Only an existing AdminCP page name is
+// accepted — never a full URL — so it cannot be used as an open redirect.
+function adminSafeNext($next) {
+    $next = (string) $next;
+    if (!preg_match('/^[a-z0-9_]+\.php$/', $next) || in_array($next, ['login.php', 'logout.php', 'index.php'], true)) return 'dashboard.php';
+    return is_file(__DIR__ . '/' . $next) ? $next : 'dashboard.php';
+}
+$login_next = adminSafeNext($_POST['next'] ?? $_GET['next'] ?? '');
 
 // Redirect if already logged in
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
-    header('Location: dashboard.php');
+    header('Location: ' . $login_next);
     exit;
 }
 
@@ -18,20 +29,33 @@ $error_message = '';
 define('MAX_LOGIN_ATTEMPTS', 5);
 define('LOCKOUT_MINUTES', 15);
 
+// Prepared statement for the admin_users updates below (never builds SQL from input)
+function adminLoginExec($conn, $sql, $types, ...$args) {
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, $types, ...$args);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
-    $password = $_POST['password'];
+  try {
+    $username = trim((string) ($_POST['username'] ?? ''));
+    $password = (string) ($_POST['password'] ?? '');
 
-    $query = "SELECT * FROM admin_users WHERE username = '$username' AND status = 'active'";
-    $result = mysqli_query($conn, $query);
+    $stmt = mysqli_prepare($conn, "SELECT * FROM admin_users WHERE username = ? AND status = 'active' LIMIT 1");
+    mysqli_stmt_bind_param($stmt, 's', $username);
+    mysqli_stmt_execute($stmt);
+    $admin = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+    mysqli_stmt_close($stmt);
+    $who = $admin ? ['id' => $admin['id'], 'username' => $admin['username'], 'role' => $admin['role']] : ['id' => null, 'username' => mb_substr($username, 0, 50), 'role' => ''];
 
-    if ($result && mysqli_num_rows($result) == 1) {
-        $admin = mysqli_fetch_assoc($result);
+    if ($admin) {
         $is_locked = !empty($admin['locked_until']) && strtotime($admin['locked_until']) > time();
 
         if ($is_locked) {
             $minutes_left = max(1, ceil((strtotime($admin['locked_until']) - time()) / 60));
             $error_message = "Too many failed attempts. Try again in {$minutes_left} minute(s).";
+            audit_log($conn, 'login_blocked', 'auth', $admin['username'], 'Sign-in attempt while the account is locked', $who);
         } elseif (password_verify($password, $admin['password'])) {
             // Correct password — regenerate the session ID before establishing the
             // authenticated session so a pre-login session (session fixation) can
@@ -44,24 +68,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['admin_name'] = $admin['full_name'];
             $_SESSION['admin_role'] = $admin['role'];
 
-            mysqli_query($conn, "UPDATE admin_users SET last_login = NOW(), failed_login_attempts = 0, locked_until = NULL WHERE id = " . (int) $admin['id']);
+            adminLoginExec($conn, "UPDATE admin_users SET last_login = NOW(), failed_login_attempts = 0, locked_until = NULL WHERE id = ?", 'i', (int) $admin['id']);
+            audit_log($conn, 'login', 'auth', $admin['username'], 'Signed in');
 
-            header('Location: dashboard.php');
+            header('Location: ' . $login_next);
             exit;
         } else {
             // Wrong password — count the attempt and lock the account once the threshold is hit.
             $attempts = (int) $admin['failed_login_attempts'] + 1;
             if ($attempts >= MAX_LOGIN_ATTEMPTS) {
-                mysqli_query($conn, "UPDATE admin_users SET failed_login_attempts = 0, locked_until = DATE_ADD(NOW(), INTERVAL " . LOCKOUT_MINUTES . " MINUTE) WHERE id = " . (int) $admin['id']);
+                adminLoginExec($conn, "UPDATE admin_users SET failed_login_attempts = 0, locked_until = DATE_ADD(NOW(), INTERVAL " . (int) LOCKOUT_MINUTES . " MINUTE) WHERE id = ?", 'i', (int) $admin['id']);
                 $error_message = "Too many failed attempts. Account locked for " . LOCKOUT_MINUTES . " minutes.";
+                audit_log($conn, 'account_locked', 'auth', $admin['username'], 'Locked for ' . LOCKOUT_MINUTES . ' minutes after ' . MAX_LOGIN_ATTEMPTS . ' wrong passwords', $who);
             } else {
-                mysqli_query($conn, "UPDATE admin_users SET failed_login_attempts = $attempts WHERE id = " . (int) $admin['id']);
+                adminLoginExec($conn, "UPDATE admin_users SET failed_login_attempts = ? WHERE id = ?", 'ii', $attempts, (int) $admin['id']);
                 $error_message = 'Invalid username or password';
+                audit_log($conn, 'login_failed', 'auth', $admin['username'], 'Wrong password (attempt ' . $attempts . ' of ' . MAX_LOGIN_ATTEMPTS . ')', $who);
             }
         }
     } else {
         $error_message = 'Invalid username or password';
+        audit_log($conn, 'login_failed', 'auth', mb_substr($username, 0, 50), 'Unknown or inactive username', $who);
     }
+  } catch (mysqli_sql_exception $e) {
+    error_log('[login] ' . $e->getMessage());
+    $error_message = 'Sign-in is temporarily unavailable. Please try again in a moment.';
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -216,6 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php endif; ?>
 
         <form method="POST">
+            <?php if ($login_next !== 'dashboard.php'): ?><input type="hidden" name="next" value="<?php echo htmlspecialchars($login_next); ?>"><?php endif; ?>
             <div class="form-group">
                 <label for="username"><i class="fas fa-user"></i> Username</label>
                 <input type="text" id="username" name="username" required autofocus placeholder="Enter your username">

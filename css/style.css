@@ -560,6 +560,56 @@ body :is(.adm-alert-err, .ct-alert-err, .al-alert-error) {
 /* Header spans a little wider than page content so the brand bar fits */
 #main-header .container { max-width: 1360px; }
 
+/* ── PORTAL BAR (thin navy strip above the brand bar; desktop only) ── */
+.portal-bar {
+    background: var(--primary-dark);
+    color: rgba(255,255,255,0.78);
+    font-size: 12.5px;
+    max-height: 44px;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+.portal-bar .container { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 40px; }
+.portal-bar-info { display: flex; align-items: center; gap: 20px; min-width: 0; }
+.portal-bar-info > a, .portal-bar-info > span { display: inline-flex; align-items: center; gap: 7px; color: rgba(255,255,255,0.78); white-space: nowrap; }
+.portal-bar-info > a:hover { color: #fff; }
+.portal-bar-info i { color: var(--gold-color); font-size: 11px; }
+.portal-bar-social { gap: 4px !important; }
+.portal-bar-social a { width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.7); transition: background-color var(--transition), color var(--transition); }
+.portal-bar-social a i { color: inherit; }
+.portal-bar-social a:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.portal-links { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.portal-link {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 6px 12px; border-radius: 6px;
+    color: rgba(255,255,255,0.9); font-family: var(--font-heading); font-size: 12.5px; font-weight: 500; white-space: nowrap;
+    transition: background-color var(--transition), color var(--transition);
+}
+.portal-link i { font-size: 12px; color: var(--accent-bright); }
+.portal-link:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.portal-link + .portal-link:not(.is-parents)::before { content: ''; width: 1px; height: 14px; background: rgba(255,255,255,0.18); margin: 0 6px 0 -10px; }
+.portal-link.is-parents { background: var(--gold-color); color: var(--primary-dark); font-weight: 600; margin-right: 8px; }
+.portal-link.is-parents i { color: var(--primary-dark); }
+.portal-link.is-parents:hover { background: #E8B84A; color: var(--primary-dark); }
+#main-header.scrolled .portal-bar { max-height: 0; opacity: 0; }
+/* Phones/tablets: the portal bar is hidden, so Parents Portal gets its own button beside Apply Now */
+.mobile-parents-btn { display: none; }
+@media (max-width: 1024px) {
+    .mobile-parents-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        min-height: 38px; padding: 0 12px; border-radius: 8px; flex-shrink: 0;
+        background: var(--gold-color); color: var(--primary-dark); font-size: 13px; font-weight: 600; white-space: nowrap;
+    }
+    .mobile-parents-btn:hover { background: #E8B84A; color: var(--primary-dark); }
+}
+@media (max-width: 480px) {
+    .mobile-parents-btn { width: 38px; padding: 0; }
+    .mobile-parents-btn span { display: none; }
+    .brand-actions { gap: 6px; }
+    .brand-actions .apply-now-word { display: none; }
+}
+.portal-bar a:focus-visible { outline: 2px solid var(--gold-color); outline-offset: 2px; }
+
 /* ── BRAND BAR ── */
 .brand-bar {
     background: #fff;
@@ -738,6 +788,52 @@ body :is(.adm-alert-err, .ct-alert-err, .al-alert-error) {
     color: var(--primary-color);
 }
 .campus-login-btn i { font-size: 12px; color: var(--accent-color); }
+
+/* Alumni Portal — navy outline with a gold icon */
+.alumni-portal-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background: var(--primary-color);
+    color: #fff;
+    border: 1.5px solid var(--primary-color);
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color var(--transition), background-color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+    flex-shrink: 0;
+}
+.alumni-portal-btn i { font-size: 12px; color: var(--gold-color); }
+.alumni-portal-btn:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    color: #fff;
+    box-shadow: inset 0 -2px 0 var(--gold-color);
+}
+
+/* Admin Portal — external EduPortal login; quiet outline with a shield */
+.admin-portal-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background: #fff;
+    color: var(--primary-color);
+    border: 1.5px solid var(--primary-color);
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color var(--transition), background-color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+    flex-shrink: 0;
+}
+.admin-portal-btn i { font-size: 12px; color: var(--accent-color); }
+.admin-portal-btn:hover { background: var(--primary-color); color: #fff; }
+.admin-portal-btn:hover i { color: #fff; }
 
 /* Apply Now — primary call to action */
 .apply-now-btn {
@@ -965,11 +1061,8 @@ body :is(.adm-alert-err, .ct-alert-err, .al-alert-error) {
 
 
 /* ── HEADER RESPONSIVE ── */
-@media (max-width: 1360px) {
-    /* Not enough room for both contacts — keep the phone */
-    .brand-contact-sep,
-    .brand-contact a[href^="mailto:"] { display: none; }
-}
+
+
 
 @media (max-width: 1200px) {
     .brand-social { display: none; }
@@ -987,8 +1080,8 @@ body :is(.adm-alert-err, .ct-alert-err, .al-alert-error) {
     #main-header.scrolled .brand-identity img { height: 46px; }
     .brand-identity { flex-shrink: 1; }
     .brand-right { gap: 10px; }
-    .brand-contact,
-    .brand-actions .campus-login-btn { display: none; }
+    .portal-bar,
+    .brand-contact { display: none; }
     .apply-now-btn { padding: 8px 14px; font-size: 13px; box-shadow: none; }
 
     .menu-toggle { display: flex; }
@@ -1079,6 +1172,16 @@ body :is(.adm-alert-err, .ct-alert-err, .al-alert-error) {
     .nav-mobile-actions { display: flex; gap: 10px; }
     .nav-mobile-actions a { flex: 1; padding: 11px 14px; }
     .nav-mobile-actions .apply-now-btn { box-shadow: none; }
+    .nav-mobile-actions { display: grid !important; grid-template-columns: 1fr 1fr; }
+    .nav-mobile-actions .apply-now-btn { grid-column: 1 / -1; }
+    .nav-mobile-actions .nav-portal {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 11px 12px; border-radius: 8px; border: 1.5px solid var(--border-color);
+        background: #fff; color: var(--primary-color); font-size: 13px; font-weight: 600;
+    }
+    .nav-mobile-actions .nav-portal i { color: var(--accent-color); }
+    .nav-mobile-actions .nav-portal.is-parents { grid-column: 1 / -1; background: var(--gold-color); border-color: var(--gold-color); color: var(--primary-dark); }
+    .nav-mobile-actions .nav-portal.is-parents i { color: var(--primary-dark); }
     .nav-mobile-contact {
         display: flex;
         flex-direction: column;
@@ -1121,7 +1224,7 @@ body :is(.adm-alert-err, .ct-alert-err, .al-alert-error) {
     .brand-identity { gap: 10px; }
     .brand-identity img,
     #main-header.scrolled .brand-identity img { height: 40px; }
-    .brand-name { font-size: 13px; letter-spacing: -0.1px; line-height: 1.25; }
+    .brand-name { font-size: 13px; letter-spacing: -0.1px; line-height: 1.25; -webkit-line-clamp: 3; }
     .brand-right { gap: 8px; }
     /* Compact Apply Now so the main call to action stays visible on phones */
     .brand-actions .apply-now-btn { padding: 7px 11px; font-size: 12.5px; }
@@ -1302,4 +1405,136 @@ section { padding: var(--section-y) 0; }
 @media (max-width: 480px) {
     .container { padding: 0 16px; }
     .section-title { font-size: 22px; }
+}
+
+/* ================================================================
+   HEADER (hx-*) — two tiers: white brand/contact bar + navy centred menu.
+   Same layout and behaviour as the Tameer-e-Nau header; IQRA colours.
+   ================================================================ */
+.hx-header { position: sticky; top: 0; z-index: 1000; transition: box-shadow 0.25s ease; }
+.hx-header.is-scrolled { box-shadow: 0 6px 24px rgba(16,42,86,0.14); }
+.hx-header .container { max-width: 1240px; }
+
+/* Tier 1: brand + contact */
+.hx-topbar { position: relative; z-index: 1; background: #fff; border-bottom: 1px solid var(--border-color); box-shadow: 0 1px 4px rgba(16,42,86,0.04); }
+.hx-topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: 9px; }
+.hx-brand { display: flex; align-items: center; gap: 12px; flex: 1 1 0%; min-width: 0; text-decoration: none; }
+.hx-brand-logo { height: 56px; width: 56px; object-fit: contain; flex-shrink: 0; }
+.hx-brand-text { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.hx-brand-text strong { font-family: var(--font-heading); font-weight: 700; font-size: 16px; color: var(--primary-color); }
+.hx-brand-text small { font-size: 11.5px; color: var(--text-light); letter-spacing: .02em; }
+.hx-info-group, .hx-actions { flex-shrink: 0; }
+.hx-info-group { display: flex; align-items: center; gap: 28px; }
+.hx-info { display: flex; align-items: center; gap: 10px; color: var(--text-color); text-decoration: none; }
+.hx-info-icon { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--primary-color); color: #fff; font-size: 14px; transition: background 0.25s ease; }
+.hx-info:hover .hx-info-icon { background: var(--accent-color); }
+.hx-info small { display: block; font-size: 10.5px; color: var(--text-light); }
+.hx-info strong { display: block; font-size: 12.5px; color: var(--text-color); white-space: nowrap; }
+.hx-actions { display: flex; align-items: center; gap: 12px; }
+.hx-social { display: flex; align-items: center; gap: 8px; }
+.hx-social a { width: 30px; height: 30px; border-radius: 50%; background: var(--primary-color); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: transform 0.25s ease, background 0.25s ease; }
+.hx-social a:hover { background: var(--accent-color); color: #fff; transform: translateY(-2px); }
+.hx-apply-btn {
+    display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+    background: var(--accent-color); color: #fff; font-weight: 700; font-size: 13px;
+    padding: 9px 20px; border-radius: 999px; text-decoration: none;
+    box-shadow: 0 6px 16px rgba(11,166,201,0.28);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+.hx-apply-btn:hover { background: var(--accent-hover); color: #fff; transform: translateY(-2px); box-shadow: 0 10px 24px rgba(11,166,201,0.38); }
+.hx-header a:focus-visible, .hx-header button:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+
+/* Tier 2: navy navbar */
+.hx-navbar { background: var(--primary-color); }
+.hx-navbar-inner { display: flex; justify-content: center; }
+.hx-nav { display: flex; align-items: center; gap: 2px; }
+.hx-nav > a, .hx-dropdown-trigger {
+    position: relative; display: inline-flex; align-items: center; gap: 5px;
+    padding: 18px 20px; color: rgba(255,255,255,0.86);
+    font-family: var(--font-body); font-weight: 600; font-size: 12.5px;
+    text-transform: uppercase; letter-spacing: .05em; cursor: pointer; text-decoration: none;
+    transition: color 0.25s ease;
+}
+.hx-nav > a:focus-visible, .hx-dropdown-trigger:focus-visible { outline: 2px solid var(--gold-color); outline-offset: -4px; }
+/* gold line that slides across the top on hover and marks the current page */
+.hx-nav > a::after, .hx-dropdown-trigger::after { content: ''; position: absolute; left: 0; right: 100%; top: 0; height: 3px; background: var(--gold-color); transition: right 0.25s ease; }
+.hx-nav > a:hover, .hx-nav > a.is-active,
+.hx-dropdown:hover .hx-dropdown-trigger, .hx-dropdown:focus-within .hx-dropdown-trigger, .hx-dropdown.is-active .hx-dropdown-trigger { color: var(--accent-bright); }
+.hx-nav > a:hover::after, .hx-nav > a.is-active::after,
+.hx-dropdown:hover .hx-dropdown-trigger::after, .hx-dropdown:focus-within .hx-dropdown-trigger::after, .hx-dropdown.is-active .hx-dropdown-trigger::after { right: 0; }
+.hx-caret { font-size: 10px; opacity: .75; transition: transform 0.25s ease; }
+.hx-dropdown:hover .hx-caret, .hx-dropdown:focus-within .hx-caret { transform: rotate(180deg); }
+.hx-dropdown { position: relative; }
+.hx-dropdown-panel {
+    position: absolute; top: 100%; left: 0; min-width: 210px;
+    display: flex; flex-direction: column; padding: 8px;
+    background: #fff; border: 1px solid var(--border-color); border-top: 3px solid var(--gold-color);
+    border-radius: 10px; box-shadow: 0 16px 40px rgba(16,42,86,0.16);
+    opacity: 0; visibility: hidden; transform: translateY(-6px);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease; z-index: 1001;
+}
+.hx-dropdown:hover .hx-dropdown-panel, .hx-dropdown:focus-within .hx-dropdown-panel { opacity: 1; visibility: visible; transform: translateY(4px); }
+.hx-dropdown-panel a { padding: 9px 12px; border-radius: 6px; color: var(--text-color); font-size: 14px; font-weight: 500; white-space: nowrap; text-decoration: none; transition: background 0.25s ease, color 0.25s ease; }
+.hx-dropdown-panel a:hover, .hx-dropdown-panel a.is-active { background: var(--light-blue); color: var(--primary-color); }
+/* the in-menu Apply button only appears inside the mobile drawer */
+.hx-nav > a.hx-drawer-apply { display: none; }
+
+/* Hamburger + drawer backdrop */
+.hx-toggle { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 44px; height: 44px; padding: 0; border: none; background: none; cursor: pointer; flex-shrink: 0; position: relative; z-index: 1202; }
+.hx-toggle-bar { width: 22px; height: 2px; border-radius: 2px; background: var(--text-color); transition: transform 0.25s ease, opacity 0.25s ease; }
+.hx-toggle.is-open .hx-toggle-bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hx-toggle.is-open .hx-toggle-bar:nth-child(2) { opacity: 0; }
+.hx-toggle.is-open .hx-toggle-bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.hx-backdrop { display: none; position: fixed; inset: 0; background: rgba(11,31,66,0.5); z-index: 1100; opacity: 0; transition: opacity 0.25s ease; }
+
+@media (max-width: 1240px) {
+    .hx-nav > a, .hx-dropdown-trigger { padding: 18px 14px; }
+}
+@media (max-width: 1180px) {
+    .hx-info-group { display: none; }
+}
+@media (max-width: 1040px) {
+    .hx-nav > a, .hx-dropdown-trigger { padding: 18px 10px; letter-spacing: .03em; }
+}
+@media (max-width: 900px) {
+    .hx-toggle { display: flex; }
+    /* the navbar collapses; its menu becomes a slide-in drawer from the right */
+    .hx-navbar { background: transparent; }
+    .hx-nav {
+        position: fixed; top: 0; right: 0; bottom: 0; width: min(320px, 85vw);
+        flex-direction: column; align-items: stretch; gap: 0;
+        padding: 84px 22px 28px; background: #fff; box-shadow: 0 16px 40px rgba(16,42,86,0.2);
+        overflow-y: auto; transform: translateX(100%);
+        transition: transform 360ms cubic-bezier(.4,0,.2,1); z-index: 1201;
+    }
+    .hx-nav.is-open { transform: translateX(0); }
+    .hx-header.nav-open .hx-topbar { z-index: 1300; }
+    .hx-backdrop.is-open { display: block; opacity: 1; }
+    .hx-nav > a, .hx-dropdown-trigger {
+        width: 100%; min-height: 48px; padding: 0 4px; justify-content: space-between;
+        color: var(--text-color) !important; font-size: 15px; text-transform: none; letter-spacing: normal;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .hx-nav > a.is-active, .hx-dropdown.is-active .hx-dropdown-trigger { color: var(--primary-color) !important; box-shadow: inset 3px 0 0 var(--gold-color); padding-left: 12px; }
+    .hx-nav > a::after, .hx-dropdown-trigger::after { display: none; }
+    .hx-caret { color: var(--text-color); opacity: .7; }
+    .hx-dropdown { width: 100%; }
+    .hx-dropdown-panel { position: static; display: none; opacity: 1; visibility: visible; transform: none; min-width: 0; padding: 4px 0 8px 14px; border: none; border-radius: 0; box-shadow: none; background: transparent; }
+    .hx-dropdown.is-open .hx-dropdown-panel { display: flex; }
+    .hx-dropdown.is-open .hx-caret { transform: rotate(180deg); }
+    .hx-dropdown:hover .hx-dropdown-panel { transform: none; }
+    .hx-dropdown-panel a { min-height: 42px; display: flex; align-items: center; }
+    .hx-nav > a.hx-drawer-apply { display: flex; justify-content: center; margin-top: 18px; min-height: 48px; color: #fff !important; border-bottom: none; box-shadow: none; }
+}
+@media (max-width: 700px) {
+    .hx-brand-text strong { font-size: 14px; }
+}
+@media (max-width: 600px) {
+    .hx-apply-btn, .hx-social { display: none; }
+    .hx-brand-logo { height: 42px; width: 42px; }
+    .hx-brand-text small { display: none; }
+    .hx-topbar-inner { padding-block: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .hx-nav, .hx-dropdown-panel, .hx-nav > a::after, .hx-dropdown-trigger::after { transition: none; }
 }

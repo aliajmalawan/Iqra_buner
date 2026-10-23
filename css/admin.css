@@ -370,3 +370,14 @@ body.admin-body .main-content [style*="space-between"] { flex-wrap: wrap; gap: 1
     body.admin-body .main-content [style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
     body.admin-body .main-content h2[style*="primary-color"] { font-size: 17px; }
 }
+
+/* ── Submit feedback for small table/action buttons (sidebar.php adds .is-loading) ── */
+body.admin-body .action-btn { position: relative; }
+body.admin-body .action-btn.is-loading { color: transparent !important; pointer-events: none; cursor: progress; }
+body.admin-body .action-btn.is-loading > * { visibility: hidden; }
+body.admin-body .action-btn.is-loading::after {
+    content: ''; position: absolute; inset: 0; margin: auto;
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid var(--primary-color, #102A56); border-right-color: transparent;
+    animation: btn-spin 0.7s linear infinite;
+}

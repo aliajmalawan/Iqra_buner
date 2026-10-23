@@ -43,6 +43,13 @@
                         <li><a href="faculty.php">Our Faculty</a></li>
                         <li><a href="events.php">Events &amp; News</a></li>
                         <li><a href="gallery.php">Gallery</a></li>
+                        <li><a href="alumni.php">Alumni Portal</a></li>
+                        <?php $ft_eduportal = getEduPortalLinks(); ?>
+                        <li><a href="parents-login.php">Parents Login</a></li>
+                        <?php if ($ft_eduportal['admin']): ?>
+                        <li><a href="<?php echo htmlspecialchars($ft_eduportal['admin']); ?>" target="_blank" rel="noopener noreferrer">Admin Portal (EduPortal)</a></li>
+                        <?php endif; ?>
+                        <li><a href="AdminCP/login.php?next=manage_support_staff.php" rel="nofollow">Support Staff (Staff Login)</a></li>
                     </ul>
                 </nav>
 
@@ -96,7 +103,7 @@
         <div class="ft-bottom">
             <div class="container ft-bottom-inner">
                 <p>&copy; <?php echo date('Y'); ?> <?php echo getSiteName(); ?>. All rights reserved.</p>
-                <p>Designed by <a href="#">Computech</a></p>
+                <p>Designed by <span class="ft-credit">Computech</span></p>
             </div>
         </div>
     </footer>

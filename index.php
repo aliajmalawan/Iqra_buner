@@ -603,10 +603,129 @@ if ($notifications && mysqli_num_rows($notifications) > 0):
     .hp-tier:nth-child(odd) { border-right:1px solid var(--border-color); }
     .hp-app { padding:26px 22px; }
 }
+
+/* ── Portals & Services ── */
+.hp-portals { padding:var(--section-y) 0; background:#fff; }
+.hp-portal-grid { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:22px; }
+.hp-portal {
+    position:relative; display:flex; flex-direction:column;
+    padding:28px 24px 24px; border-radius:var(--radius-card);
+    background:#fff; border:1px solid var(--border-color); box-shadow:var(--shadow-card);
+    transition:transform var(--dur) var(--ease-out), box-shadow var(--dur) ease, border-color var(--dur) ease;
+}
+.hp-portal::before { content:''; position:absolute; left:24px; right:24px; top:0; height:3px; border-radius:0 0 3px 3px; background:var(--accent-color); }
+.hp-portal:hover, .hp-portal:focus-within { transform:translateY(-4px); box-shadow:var(--shadow-card-hover); border-color:rgba(11,166,201,0.35); }
+.hp-portal-top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
+.hp-portal-ico { width:54px; height:54px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; background:var(--light-blue); color:var(--accent-text); }
+.hp-portal-tag { padding:4px 10px; border-radius:999px; font-size:11.5px; font-weight:600; letter-spacing:0.2px; background:#F1F5F9; color:var(--text-light); white-space:nowrap; }
+.hp-portal h3 { font-size:var(--fs-card-title); font-weight:700; color:var(--primary-color); margin:0 0 8px; }
+.hp-portal p { font-size:var(--fs-body-sm); color:var(--text-light); line-height:1.7; margin:0 0 20px; }
+.hp-portal-actions { margin-top:auto; display:flex; flex-direction:column; gap:10px; }
+.hp-portal-actions .btn { width:100%; justify-content:center; }
+.hp-portal-actions .btn .fa-arrow-up-right-from-square { font-size:11px; }
+.hp-portal-link { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:36px; font-size:13.5px; font-weight:600; color:var(--accent-text); border-radius:6px; }
+.hp-portal-link:hover { color:var(--primary-color); text-decoration:underline; }
+.hp-portal-link:focus-visible, .hp-portal .btn:focus-visible { outline:3px solid rgba(11,166,201,0.45); outline-offset:2px; }
+.hp-portal-note { display:flex; align-items:center; justify-content:center; gap:7px; font-size:12.5px; color:var(--text-light); min-height:36px; }
+/* Parents: the most-used portal gets the gold accent */
+.hp-portal.is-parents::before { background:var(--gold-color); }
+.hp-portal.is-parents .hp-portal-ico { background:#FBF3DE; color:#9A6B0F; }
+.hp-portal.is-parents .hp-portal-tag { background:#FBF3DE; color:#8A5D0A; }
+.hp-portal .btn-gold { background:var(--gold-color); border-color:var(--gold-color); color:var(--primary-dark); }
+.hp-portal .btn-gold:hover { background:#E8B84A; border-color:#E8B84A; color:var(--primary-dark); }
+/* Support Staff: internal — navy card */
+.hp-portal.is-internal { background:var(--primary-color); border-color:var(--primary-color); }
+.hp-portal.is-internal::before { background:var(--gold-color); }
+.hp-portal.is-internal h3 { color:#fff; }
+.hp-portal.is-internal p, .hp-portal.is-internal .hp-portal-note { color:rgba(255,255,255,0.75); }
+.hp-portal.is-internal .hp-portal-ico { background:rgba(255,255,255,0.1); color:var(--gold-color); }
+.hp-portal.is-internal .hp-portal-tag { background:rgba(217,166,46,0.18); color:#F3D58A; }
+.hp-portal.is-internal .hp-portal-note i { color:var(--gold-color); }
+@media (max-width:1100px) { .hp-portal-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+@media (max-width:600px) { .hp-portal-grid { grid-template-columns:1fr; } .hp-portal { padding:24px 20px 20px; } }
 @media (prefers-reduced-motion:reduce) {
     .hp-reveal { opacity:1; transform:none; transition:none; }
 }
 </style>
+
+<!-- ===== PORTALS & SERVICES ===== -->
+<?php
+$hp_edu = getEduPortalLinks();
+$hp_parents_href = 'parents-login.php';
+$hp_ext = ' target="_blank" rel="noopener noreferrer"';
+?>
+<section class="hp-portals" id="portals" aria-labelledby="portalsTitle">
+    <div class="container">
+        <div class="hp-sh">
+            <div class="section-badge">Portals &amp; Services</div>
+            <h2 id="portalsTitle">Quick Access to <span>Our Portals</span></h2>
+            <p>Parents, administrators, former students and school staff — sign in to the right place in one click.</p>
+        </div>
+        <div class="hp-portal-grid">
+            <article class="hp-portal is-parents hp-reveal">
+                <div class="hp-portal-top">
+                    <span class="hp-portal-ico"><i class="fas fa-people-roof" aria-hidden="true"></i></span>
+                    <span class="hp-portal-tag">For Parents</span>
+                </div>
+                <h3>Parents Portal</h3>
+                <p>Follow your child's results, attendance and fee details through EduPortal.</p>
+                <div class="hp-portal-actions">
+                    <a href="<?php echo htmlspecialchars($hp_parents_href); ?>" class="btn btn-gold">
+                        <i class="fas fa-right-to-bracket" aria-hidden="true"></i> Parents Login
+                    </a>
+                    <a href="parents-portal.php" class="hp-portal-link">How to get access <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                </div>
+            </article>
+
+            <article class="hp-portal hp-reveal">
+                <div class="hp-portal-top">
+                    <span class="hp-portal-ico"><i class="fas fa-user-shield" aria-hidden="true"></i></span>
+                    <span class="hp-portal-tag">For Administrators</span>
+                </div>
+                <h3>Admin Portal</h3>
+                <p>The school's EduPortal management system for authorised administrators.</p>
+                <div class="hp-portal-actions">
+                    <?php if ($hp_edu['admin']): ?>
+                    <a href="<?php echo htmlspecialchars($hp_edu['admin']); ?>" class="btn btn-primary"<?php echo $hp_ext; ?> aria-label="Admin Portal (opens EduPortal in a new tab)">
+                        <i class="fas fa-right-to-bracket" aria-hidden="true"></i> Open Admin Portal <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                    </a>
+                    <?php else: ?>
+                    <span class="hp-portal-note"><i class="fas fa-clock" aria-hidden="true"></i> Link coming soon</span>
+                    <?php endif; ?>
+                    <span class="hp-portal-note"><i class="fas fa-lock" aria-hidden="true"></i> Authorised staff only</span>
+                </div>
+            </article>
+
+            <article class="hp-portal hp-reveal">
+                <div class="hp-portal-top">
+                    <span class="hp-portal-ico"><i class="fas fa-user-graduate" aria-hidden="true"></i></span>
+                    <span class="hp-portal-tag">For Former Students</span>
+                </div>
+                <h3>Alumni Portal</h3>
+                <p>Register in our alumni records, reconnect with your school and inspire today's students.</p>
+                <div class="hp-portal-actions">
+                    <a href="alumni.php#register" class="btn btn-primary"><i class="fas fa-user-plus" aria-hidden="true"></i> Register as Alumni</a>
+                    <a href="alumni.php#directory" class="hp-portal-link">Alumni Directory <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                </div>
+            </article>
+
+            <article class="hp-portal is-internal hp-reveal">
+                <div class="hp-portal-top">
+                    <span class="hp-portal-ico"><i class="fas fa-people-carry-box" aria-hidden="true"></i></span>
+                    <span class="hp-portal-tag">Internal</span>
+                </div>
+                <h3>Support Staff</h3>
+                <p>Records of drivers, security, office and support staff — managed by school administrators.</p>
+                <div class="hp-portal-actions">
+                    <a href="AdminCP/login.php?next=manage_support_staff.php" class="btn btn-gold" rel="nofollow" aria-label="Support Staff — staff login (authorised school administrators only)">
+                        <i class="fas fa-lock" aria-hidden="true"></i> Staff Login
+                    </a>
+                    <span class="hp-portal-note"><i class="fas fa-shield-halved" aria-hidden="true"></i> Login required — not public</span>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
 
 <!-- ===== STATS ===== -->
 <?php $stats = getStatistics(); $stats_header = getStatsHeader(); ?>
@@ -735,6 +854,14 @@ $course_cat_labels = ['school' => 'Play Group – Class 8', 'matric' => 'Matric'
         </div>
         <?php endif; ?>
 
+        <?php
+        // Only a real store address shows the app download; until one is set in AdminCP the
+        // block points parents to the Parents Portal instead of a dead "Google Play" button.
+        $hp_play = trim((string) $dms_header['playstore_link']);
+        $hp_play_ok = (bool) preg_match('#^https://#i', $hp_play) && filter_var($hp_play, FILTER_VALIDATE_URL);
+        $hp_dms_edu = getEduPortalLinks();
+        ?>
+        <?php if ($hp_play_ok): ?>
         <div class="hp-app hp-reveal">
             <div class="hp-app-icon"><i class="fas fa-mobile-alt"></i></div>
             <div class="hp-app-text">
@@ -742,16 +869,24 @@ $course_cat_labels = ['school' => 'Play Group – Class 8', 'matric' => 'Matric'
                 <p><?php echo htmlspecialchars($dms_header['cta_desc']); ?></p>
             </div>
             <div class="hp-app-btns">
-                <a href="<?php echo htmlspecialchars($dms_header['playstore_link']); ?>" class="hp-store">
+                <a href="<?php echo htmlspecialchars($hp_play); ?>" class="hp-store" target="_blank" rel="noopener">
                     <i class="fab fa-google-play"></i>
                     <span><small>GET IT ON</small><strong>Google Play</strong></span>
                 </a>
-                <a href="#" class="hp-store is-disabled" title="Coming Soon" aria-disabled="true" onclick="return false;">
-                    <i class="fab fa-apple"></i>
-                    <span><small>COMING SOON</small><strong>App Store</strong></span>
-                </a>
             </div>
         </div>
+        <?php else: ?>
+        <div class="hp-app hp-reveal">
+            <div class="hp-app-icon"><i class="fas fa-people-roof"></i></div>
+            <div class="hp-app-text">
+                <h3>Follow Your Child Online</h3>
+                <p>Results, attendance and fee details are available to parents through the Parents Portal.</p>
+            </div>
+            <div class="hp-app-btns">
+                <a href="parents-login.php" class="btn btn-accent"><i class="fas fa-right-to-bracket"></i> Parents Login</a>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
 </section>
 

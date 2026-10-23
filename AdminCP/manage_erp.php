@@ -13,6 +13,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
 
 require_once __DIR__ . '/includes/csrf.php';
 csrf_guard();
+require_once '../includes/audit_helper.php';
 
 $message = '';
 
@@ -27,6 +28,21 @@ function saveErpSetting($conn, $key, $value) {
     }
 }
 
+// EduPortal login links (Admin Portal button + Campus Login page). https only; blank hides the button.
+if (isset($_POST['save_eduportal_links'])) {
+    $errs = [];
+    $changed = [];
+    foreach (['eduportal_parents_url' => 'Parents Portal', 'eduportal_admin_url' => 'Admin Portal', 'eduportal_campus_url' => 'Campus Login'] as $key => $label) {
+        $val = trim($_POST[$key] ?? '');
+        if ($val !== '' && eduportalCleanUrl($val) === '') { $errs[] = $label . ' link must be a full https:// address.'; continue; }
+        if ($val !== getSetting($key, '')) $changed[] = $label . ' → ' . ($val === '' ? '(blank)' : $val);
+        saveErpSetting($conn, $key, $val);
+    }
+    if ($changed) audit_log($conn, 'update', 'eduportal_links', null, implode('; ', $changed));
+    header('Location: manage_erp.php?msg=' . urlencode($errs ? implode(' ', $errs) : 'EduPortal login links saved.') . ($errs ? '&err=1' : '') . '#eduportal-links');
+    exit;
+}
+
 // Save settings
 if (isset($_POST['save_erp_settings'])) {
     saveErpSetting($conn, 'erp_enabled', isset($_POST['erp_enabled']) ? '1' : '0');
@@ -36,6 +52,7 @@ if (isset($_POST['save_erp_settings'])) {
     if (trim($_POST['erp_api_key'] ?? '') !== '') {
         saveErpSetting($conn, 'erp_api_key', trim($_POST['erp_api_key']));
     }
+    audit_log($conn, 'update', 'erp_settings', null, 'ERP sync ' . (isset($_POST['erp_enabled']) ? 'enabled' : 'disabled') . (trim($_POST['erp_api_key'] ?? '') !== '' ? '; API key replaced (value not logged)' : ''));
     header('Location: manage_erp.php?msg=' . urlencode('ERP integration settings saved.'));
     exit;
 }
@@ -57,6 +74,11 @@ if (isset($_GET['msg'])) {
 }
 
 $cfg = getErpConfig();
+$edu_links = getEduPortalLinks();
+$edu_admin_raw = getSetting('eduportal_admin_url', 'https://apps.eduportal.pk/Production/');
+$edu_campus_raw = getSetting('eduportal_campus_url', 'https://apps.eduportal.pk//Production/?aims=aims');
+$edu_parents_raw = getSetting('eduportal_parents_url', '');
+$msg_is_error = isset($_GET['err']);
 
 // Sync status counts
 function statusCounts($conn, $table) {
@@ -107,7 +129,7 @@ $recent = mysqli_query($conn, "
     <?php include 'includes/sidebar.php'; ?>
     <div class="main-content">
         <div class="admin-page-title">
-            <h1><i class="fas fa-network-wired"></i> ERP Integration</h1>
+            <h1><i class="fas fa-network-wired"></i> EduPortal &amp; ERP Integration</h1>
         </div>
 
         <div style="background:#e7f3ff;border-left:4px solid var(--primary-color);border-radius:8px;padding:14px 18px;font-size:13px;color:var(--text-dark);margin-bottom:22px;line-height:1.7;">
@@ -115,10 +137,40 @@ $recent = mysqli_query($conn, "
         </div>
 
         <?php if ($message): ?>
-            <div style="background: #F0FDF4; color: #166534; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($message); ?>
+            <div class="alert <?php echo $msg_is_error ? 'alert-error' : 'alert-success'; ?>">
+                <i class="fas <?php echo $msg_is_error ? 'fa-triangle-exclamation' : 'fa-check-circle'; ?>"></i> <?php echo htmlspecialchars($message); ?>
             </div>
         <?php endif; ?>
+
+        <div class="card" id="eduportal-links" style="margin-bottom: 30px;">
+            <h2 style="color: var(--primary-color); margin-bottom: 8px;"><i class="fas fa-user-shield"></i> EduPortal Login Links</h2>
+            <p style="color:var(--text-light);font-size:14px;margin:0 0 18px;line-height:1.7;">
+                The website's <strong>Parents Portal</strong> and <strong>Admin Portal</strong> buttons (header, mobile menu, footer) open EduPortal's own login pages in a new tab, where parents and administrators sign in with their EduPortal accounts.
+                The website never sees or stores EduPortal passwords and keeps no copy of results, attendance or fee records. EduPortal has not provided an API or single sign-on, so no automatic login is attempted.
+            </p>
+            <form method="POST"><?php echo csrf_field(); ?>
+                <div class="form-group" style="margin-bottom:16px;">
+                    <label for="edu_parents">Parents Portal login URL <span style="font-weight:400;color:var(--text-light);">— required for the Parents Portal button</span></label>
+                    <input id="edu_parents" type="url" name="eduportal_parents_url" value="<?php echo htmlspecialchars($edu_parents_raw); ?>" placeholder="https://… (EduPortal Parents Portal address given by EduPortal)">
+                    <small style="color:var(--text-light);">
+                    <?php if ($edu_links['parents']): ?>The Parents Portal button opens this address in a new tab. <a href="<?php echo htmlspecialchars($edu_links['parents']); ?>" target="_blank" rel="noopener noreferrer">Test link <i class="fas fa-arrow-up-right-from-square"></i></a>
+                    <?php else: ?><strong style="color:#B45309;">Not set yet.</strong> Until it is, the Parents Portal button opens the website's <a href="../parents-portal.php" target="_blank" rel="noopener">Parents Portal information page</a>, which asks parents to contact the school office. Get the exact Parents Portal address from EduPortal and paste it here.<?php endif; ?></small>
+                </div>
+                <div class="form-group" style="margin-bottom:16px;">
+                    <label for="edu_admin">Admin Portal login URL</label>
+                    <input id="edu_admin" type="url" name="eduportal_admin_url" value="<?php echo htmlspecialchars($edu_admin_raw); ?>" placeholder="https://… (EduPortal login address for school administrators)">
+                    <small style="color:var(--text-light);">Default: EduPortal's official login page. Ask EduPortal support to confirm the exact address IQRA administrators should use; leave blank to hide the Admin Portal button.
+                    <?php if ($edu_links['admin']): ?> <a href="<?php echo htmlspecialchars($edu_links['admin']); ?>" target="_blank" rel="noopener noreferrer">Test link <i class="fas fa-arrow-up-right-from-square"></i></a><?php else: ?> <strong style="color:#B91C1C;">Not set — the button is hidden.</strong><?php endif; ?></small>
+                </div>
+                <div class="form-group" style="margin-bottom:16px;">
+                    <label for="edu_campus">Campus Login (students / staff) URL</label>
+                    <input id="edu_campus" type="url" name="eduportal_campus_url" value="<?php echo htmlspecialchars($edu_campus_raw); ?>" placeholder="https://…">
+                    <small style="color:var(--text-light);">Shown inside the website's Campus Login page. The current address (with <code>?aims=aims</code>) came from the previous website template — please confirm it with EduPortal.
+                    <?php if ($edu_links['campus']): ?> <a href="<?php echo htmlspecialchars($edu_links['campus']); ?>" target="_blank" rel="noopener noreferrer">Test link <i class="fas fa-arrow-up-right-from-square"></i></a><?php endif; ?></small>
+                </div>
+                <button type="submit" name="save_eduportal_links" class="btn btn-primary"><i class="fas fa-save"></i> Save Login Links</button>
+            </form>
+        </div>
 
         <div class="card" style="margin-bottom: 30px;">
             <h2 style="color: var(--primary-color); margin-bottom: 20px;">Connection Settings</h2>
@@ -137,7 +189,7 @@ $recent = mysqli_query($conn, "
                     </div>
                     <div class="form-group">
                         <label for="auto_AdminCP_manage_erp_php_2">API Base URL</label>
-                        <input id="auto_AdminCP_manage_erp_php_2" type="text" name="erp_api_url" value="<?php echo htmlspecialchars($cfg['api_url']); ?>" placeholder="https://apps.eduportal.pk/api/v1">
+                        <input id="auto_AdminCP_manage_erp_php_2" type="text" name="erp_api_url" value="<?php echo htmlspecialchars($cfg['api_url']); ?>" placeholder="API address from your ERP provider's documentation">
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom:16px;">
